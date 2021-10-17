@@ -260,3 +260,33 @@ clearBuffer macro buffer
     pop di
 
 ENDM
+
+loadMenuFunction MACRO
+    local menuFunc, fin, insertFunc, chargeFileFunc
+
+    print headersMenuFunc
+    readUntilEnter bufferMenuFunc
+
+    menuFunc:
+        cmp bufferMenuFunc[0], "a"
+        je insertFunc
+        cmp bufferMenuFunc[0], "b"
+        je chargeFileFunc
+        cmp bufferMenuFunc[0], "c"
+        je fin
+        jmp menuFunc
+
+    insertFunc:
+        clearTerminal
+        clearBuffer bufferMenuFunc
+        print msgInsertFunc
+        readUntilEnter bufferMenuFunc
+
+    chargeFileFunc:
+        clearTerminal
+        clearBuffer bufferMenuFunc
+        print msgChargeFileFunc
+        readUntilEnter bufferMenuFunc
+    
+    fin:
+ENDM

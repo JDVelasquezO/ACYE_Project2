@@ -9,8 +9,17 @@ include macros.asm
                 0ah,0dh,'Proyecto no.2',
                 0ah,0dh,'Ingrese nombre de archivo de entrada o X si desea salir:',
                 0ah,0dh,'$'
+
+    headersMenuFunc db 0ah, 0dh, 'a. Ingresar Funcion',
+                       0ah, 0dh, 'b. Cargar Archivos',
+                       0ah, 0dh, 'c. Regresar a menu principal',
+                       0ah, 0dh, '$'
+
+    msgInsertFunc db "Ingrese funcion a evaluar $"
+    msgChargeFileFunc db "Ingrese archivo de carga de funciones $"
     
     bufferRoute db 50 dup("$"), 0
+    bufferMenuFunc db 50 dup("$"), 0
 .code
     ;description
     main PROC
@@ -27,11 +36,18 @@ include macros.asm
             je exitGame
             cmp bufferRoute[0], 'X'
             je exitGame
+            cmp bufferRoute[0], 'f'
+            je menuFunction
             jmp menu
-    
-    exitGame:
-        mov ax, 4C00H
-        INT 21H
+
+        menuFunction:
+            clearTerminal
+            loadMenuFunction
+            jmp menu
+        
+        exitGame:
+            mov ax, 4C00H
+            INT 21H
 
     main ENDP
 end
