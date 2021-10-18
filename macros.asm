@@ -261,6 +261,95 @@ clearBuffer macro buffer
 
 ENDM
 
+PrintText macro Text    ;Prints "Text"
+    mov ax,@data
+    mov ds,ax
+    mov ah,09h
+    lea dx,Text
+    int 21h
+endm
+
+DecimalToText macro entrada, salida ;Converts decimal to text
+    Local divide
+    Local divide2
+    Local make
+    Local negative
+    Local done
+    xor ax,ax   ;Clear ax
+    mov ax,entrada  ;Move number into ax
+	xor si,si   ;Clear si
+	xor cx,cx   ;Clear cx
+	xor bx,bx   ;Clear bx
+	xor dx,dx   ;Clear dx
+	mov bx,0ah  ;Move 10 into bx
+	test ax,1000000000000000    ;Compare if ax is negative
+	jnz negative    ;If ax is negative go to negative
+	jmp divide2 ;if ax is positive go to divide2
+	negative:
+		neg ax  ;Negate ax to make it positive
+		mov salida[si],45   ;Move a "-" at the start of text
+		inc si  ;Increment counter si
+		jmp divide2    ;Go to divide 2
+	divide:
+		xor dx,dx   ;Clear dx
+	divide2:
+		div bx  ;divide ax by bx
+		inc cx  ;Increment counter cx
+		push dx ;Push dx register into stack
+		cmp ax,00h  ;Campre if ax is 0
+		je make ;IF ax is 0 go to make
+		jmp divide  ;If ax is not 0 go to divide
+	make:
+		pop ax  ;Take out last register from stack
+		add ax,30h  ;Make conversion
+		mov salida[si],ax   ;Move ax into salida position si
+		inc si  ;Increment counter si
+		loop make ;Loop to make
+		mov ax,24h  ;Move $ to ax
+		mov salida[si],ax   ;Move ax into salida position si
+		inc si  ;Increment si
+	done:
+		PrintText salida    ;Display result
+endm
+
+TextToDecimal macro buffer, des ;Converts text to decimal
+    Local start, fin, negative, positive, done, negate
+
+	xor ax,ax   ;Clears ax registry
+	xor bx,bx   ;Clears bx registry
+	xor cx,cx   ;Clears cx registry
+	xor di,di   ;Clears di resistry, 0 = Positive, 1 = Negative
+	mov bx,10	;Moves 10 into bx
+	xor si,si   ;Clears si registry, for counter of position inside buffer
+	start:
+		mov cl,buffer[si]   ;Move buffer in position si into cl
+		cmp cl,45   ;Compares if cl is "-"
+		je negative ;If cl is "-" jump to negative
+		jmp positive    ;If cl is not "-" jump to positive
+	negative:
+		inc di  ;Increment di to 1, now the number is negative
+		inc si  ;Increment si by 1 to read next value
+		mov cl,buffer[si]   ;Move the next value into cl
+	positive:
+		cmp cl,48   ;Compares if cl is 0
+		jl fin  ;Jump to negate
+		cmp cl,57   ;Compares if cl is 9
+		jg fin  ;Jump to negate
+		inc si  ;Increment si to read next value
+		sub cl,48	;Substract 48 to cl to get number
+		mul bx		;Multiply ax by bx
+		add ax,cx	;Add to ax cx
+		jmp start   ;Jump to start
+	fin:
+		cmp di,1    ;Compares if di = 1
+		je negate   ;Go to negate to negate ax
+		jmp done    ;If di = 0 go to done
+	negate:
+		neg ax  ;Negates ax
+	done:
+        mov des,ax  ;Moves register ax into des, which is output
+endm
+
 loadMenuFunction MACRO
     local menuFunc, fin, insertFunc, chargeFileFunc
 
@@ -303,17 +392,9 @@ verifyFunction MACRO
     cmp bufferOption[0], "-"
     je ok
     
-    ; TextToDecimal
-    ; xor di, di
-    ; mov bl, bufferMenuFunc[0]
-    ; ciclo0:
-    ;     cmp bl, di
-    ;     je ok
-    ;     inc di
-    ;     cmp di, 9
-    ;     jne ciclo0
-    
-    jmp error
+    TextToDecimal bufferOption[0], number1n
+    cmp number1n, 0
+    je error
     
     ok:
         print test_info

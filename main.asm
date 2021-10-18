@@ -10,7 +10,7 @@ include macros.asm
                 0ah,0dh,'Ingrese nombre de archivo de entrada o X si desea salir:',
                 0ah,0dh,'$'
 
-    headersMenuFunc db 0ah, 0dh, '--- Menu de Funciones ---'
+    headersMenuFunc db 0ah, 0dh, '--- Menu de Funciones ---',
                        0ah, 0dh, 'a. Ingresar Funcion',
                        0ah, 0dh, 'b. Cargar Archivos',
                        0ah, 0dh, 'c. Regresar a menu principal',
@@ -21,11 +21,12 @@ include macros.asm
     msgInputNotValid db "Entrada no valida $"
     test_info db "Aqui todo bien $"
     
-    bufferRoute db 50 dup("$"), 0
-    bufferMenuFunc db 50 dup("$"), 0
-    bufferOption db 50 dup("$"), 0
-    bufferKey db 50 dup("$"), 0
-    number1n db ?
+    bufferRoute db 20 dup("$"), 0
+    bufferMenuFunc db 20 dup("$"), 0
+    bufferOption db 20 dup("$"), 0
+    bufferKey db 20 dup("$"), 0
+    number1n dw ?
+    resultado dw ?
 .code
     ;description
     main PROC
