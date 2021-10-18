@@ -264,10 +264,10 @@ ENDM
 loadMenuFunction MACRO
     local menuFunc, fin, insertFunc, chargeFileFunc
 
-    print headersMenuFunc
-    readUntilEnter bufferMenuFunc
-
     menuFunc:
+        clearTerminal
+        print headersMenuFunc
+        readUntilEnter bufferMenuFunc
         cmp bufferMenuFunc[0], "a"
         je insertFunc
         cmp bufferMenuFunc[0], "b"
@@ -277,16 +277,62 @@ loadMenuFunction MACRO
         jmp menuFunc
 
     insertFunc:
+        clearBuffer bufferOption
         clearTerminal
-        clearBuffer bufferMenuFunc
         print msgInsertFunc
-        readUntilEnter bufferMenuFunc
+        readUntilEnter bufferOption
+        verifyFunction
+        jmp menuFunc
 
     chargeFileFunc:
         clearTerminal
-        clearBuffer bufferMenuFunc
         print msgChargeFileFunc
-        readUntilEnter bufferMenuFunc
+        readUntilEnter bufferOption
+        jmp menuFunc
     
+    fin:
+ENDM
+
+verifyFunction MACRO
+    local ciclo, ok, fin, error
+
+    cmp bufferOption[0], "x"
+    je ok
+    cmp bufferOption[0], "+"
+    je ok
+    cmp bufferOption[0], "-"
+    je ok
+    
+    ; TextToDecimal
+    ; xor di, di
+    ; mov bl, bufferMenuFunc[0]
+    ; ciclo0:
+    ;     cmp bl, di
+    ;     je ok
+    ;     inc di
+    ;     cmp di, 9
+    ;     jne ciclo0
+    
+    jmp error
+    
+    ok:
+        print test_info
+        readUntilEnter bufferKey
+        clearBuffer bufferMenuFunc
+        jmp fin
+    ; xor si, si
+    ; ciclo:
+    ;     xor bx, bx
+    ;     mov bl, bufferMenuFunc[si]
+    ;     printRegister bl
+    ;     inc si
+    ;     cmp bufferMenuFunc[si], "$"
+    ;     jne ciclo
+
+    error:
+        print msgInputNotValid
+        readUntilEnter bufferKey
+        jmp fin
+
     fin:
 ENDM
