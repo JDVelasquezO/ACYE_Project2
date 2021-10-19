@@ -444,7 +444,7 @@ verifyFunction MACRO funcParam
         je follow
         cmp wordIndividual, 5eh ; Compara si es ^
         je follow
-        cmp wordIndividual, 30h
+        cmp wordIndividual, 30h ; Compara si es 0
         je follow
 
         TextToDecimal wordIndividual, number1n
@@ -464,10 +464,7 @@ verifyFunction MACRO funcParam
         xor dx, dx
         print msgKeyGenerated
         
-        ; mov bl, dictKey
         DecimalToAscii dictKey
-        ; printRegister dl
-        ; PrintText dictKey
 
         print space
         print msgValGenerated

@@ -7,11 +7,11 @@ include files.asm
     headers db 	0ah,0dh,'Universidad de San Carlos de Guatemala',
                 0ah,0dh,'Arquitectura de Computadores y Ensambladores 1',
                 0ah,0dh,'Grupo no.6',
-                0ah,0dh,'Proyecto no.2',
                 0ah, 0dh,'-- Menu Principal --',
-                0ah,0dh,'-- 1. (dID) Derivar funcion',
-                0ah,0dh,'-- 2. (iID) Integrar funcion',
-                0ah,0dh,'-- Ingrese nombre de archivo de entrada o X si desea salir:',
+                0ah,0dh,'-- (dID) Derivar funcion',
+                0ah,0dh,'-- (iID) Integrar funcion',
+                0ah,0dh,'-- (func) Menu funciones',
+                0ah,0dh,'-- (x) Salir',
                 0ah,0dh,'$'
 
     headersMenuFunc db 0ah, 0dh, '--- Menu de Funciones ---',
