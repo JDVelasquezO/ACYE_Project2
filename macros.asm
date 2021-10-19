@@ -421,6 +421,7 @@ verifyFunction MACRO
         print msgValGenerated
         PrintText bufferFunction
         
+        ; Guardar en diccionario
         keepOnTable
 
         clearBuffer bufferMenuFunc
@@ -441,8 +442,6 @@ keepOnTable MACRO params
     mov dictTable[0], 5fh
     
     mov ax, resultado
-    ; mov dictKeyString, al
-    ; mov bx, dictKeyString[0]
     mov dictTable[1], al
 
     mov dictTable[2], 5fh
@@ -469,5 +468,30 @@ keepOnTable MACRO params
     fin:
         print breakLine
         PrintText dictTable
+        readUntilEnter bufferKey
+ENDM
+
+lookForFunction MACRO params
+    xor si, si
+    mov bl, bufferRoute[1]
+    ciclo:
+        cmp dictTable[si], 5fh
+        jne incId
+        inc si
+        cmp dictTable[si], bl
+        jne incId
+        inc si
+        cmp dictTable[si], 5fh
+        jne incId
+        jmp idFound
+
+    incId:
+        inc si
+        jmp ciclo
+
+    idFound:
+        PrintText msgFuncFound
+        print breakLine
+        PrintText dictTable[si+1]
         readUntilEnter bufferKey
 ENDM

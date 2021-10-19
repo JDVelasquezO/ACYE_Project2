@@ -7,6 +7,8 @@ include macros.asm
                 0ah,0dh,'Arquitectura de Computadores y Ensambladores 1',
                 0ah,0dh,'Grupo no.6',
                 0ah,0dh,'Proyecto no.2',
+                0ah, 0dh,'-- Menu Principal --',
+                0ah,0dh,'1. (dID) Derivar funcion',
                 0ah,0dh,'Ingrese nombre de archivo de entrada o X si desea salir:',
                 0ah,0dh,'$'
 
@@ -21,6 +23,8 @@ include macros.asm
     msgInputNotValid db "Entrada no valida $"
     msgKeyGenerated db "Llave: $"
     msgValGenerated db "Valor: $"
+    msgDerivative db "Ingresar el id de la funcion a derivar: $"
+    msgFuncFound db "Funcion encontrada: $"
     test_info db "Aqui todo bien $"
     space db " ", "$"
     breakLine db " $", 13, 10
@@ -30,6 +34,7 @@ include macros.asm
     bufferFunction db 20 dup("$"), 0
     bufferKey db 20 dup("$"), 0
     wordIndividual db 20 dup("$"), 0
+    bufferId db 2 dup("$"), 0
 
     dictTable db 200 dup("$"), 0
     dictKey dw 0
@@ -55,6 +60,8 @@ include macros.asm
             je exitGame
             cmp bufferRoute[0], 'X'
             je exitGame
+            cmp bufferRoute[0], 'd'
+            je derivateFunc
             cmp bufferRoute[0], 'f'
             je menuFunction
             jmp menu
@@ -62,6 +69,11 @@ include macros.asm
         menuFunction:
             clearTerminal
             loadMenuFunction
+            jmp menu
+
+        derivateFunc:
+            clearTerminal
+            lookForFunction
             jmp menu
         
         exitGame:
