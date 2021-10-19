@@ -440,11 +440,10 @@ keepOnTable MACRO params
 
     mov dictTable[0], 5fh
     
-    ; mov ax, resultado
-    
-    ; mov dictKeyString, ax
+    mov ax, resultado
+    ; mov dictKeyString, al
     ; mov bx, dictKeyString[0]
-    mov dictTable[1], 30h
+    mov dictTable[1], al
 
     mov dictTable[2], 5fh
 
