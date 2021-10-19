@@ -414,8 +414,15 @@ verifyFunction MACRO
         jmp ciclo
     
     ok:
-        print test_info
-        readUntilEnter bufferKey
+        ; Imprimir llave y valor
+        print msgKeyGenerated
+        DecimalToText dictKey, resultado
+        print space
+        print msgValGenerated
+        PrintText bufferFunction
+        
+        keepOnTable
+
         clearBuffer bufferMenuFunc
         clearBuffer bufferFunction
         jmp fin
@@ -426,4 +433,35 @@ verifyFunction MACRO
         jmp fin
 
     fin:
+ENDM
+
+keepOnTable MACRO params
+    local ciclo, fin, continue
+
+    mov dictTable[0], 5fh
+    
+    mov ax, resultado
+    mov dictKeyString, ax
+    mov bx, dictKeyString[0]
+    mov dictTable[1], bx
+
+    mov dictTable[2], 5fh
+
+    ; xor si, si
+    ; xor di, di
+    ; xor bx, bx
+    ; mov si, 3
+    ; ciclo:
+    ;     mov bl, bufferFunction[di]
+    ;     mov dictTable[si], bl
+    ;     cmp bufferFunction[di+1], 24h
+    ;     je fin
+    ;     inc di
+    ;     inc si
+    ;     jmp ciclo
+
+    fin:
+        print space
+        PrintText dictTable
+        readUntilEnter bufferKey
 ENDM

@@ -19,6 +19,8 @@ include macros.asm
     msgInsertFunc db "Ingrese funcion a evaluar $"
     msgChargeFileFunc db "Ingrese archivo de carga de funciones $"
     msgInputNotValid db "Entrada no valida $"
+    msgKeyGenerated db "Llave: $"
+    msgValGenerated db "Valor: $"
     test_info db "Aqui todo bien $"
     space db " ", "$"
     
@@ -28,7 +30,9 @@ include macros.asm
     bufferKey db 20 dup("$"), 0
     wordIndividual db 20 dup("$"), 0
 
-    bufferFunctions db 20 dup("$"), 0
+    dictTable dw 200 dup("$"), 0
+    dictKey dw 0
+    dictKeyString dw 2 dup("$"), 0
 
     counter dw 0
     number1n dw ?
