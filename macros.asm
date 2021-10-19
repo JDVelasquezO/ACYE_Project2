@@ -444,6 +444,8 @@ verifyFunction MACRO funcParam
         je follow
         cmp wordIndividual, 5eh ; Compara si es ^
         je follow
+        cmp wordIndividual, 30h
+        je follow
 
         TextToDecimal wordIndividual, number1n
         cmp number1n, 0
