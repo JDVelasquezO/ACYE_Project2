@@ -348,6 +348,7 @@ TextToDecimal macro buffer, des ;Converts text to decimal
 		neg ax  ;Negates ax
 	done:
         mov des,ax  ;Moves register ax into des, which is output
+        xor si, si
 endm
 
 loadMenuFunction MACRO
@@ -366,49 +367,56 @@ loadMenuFunction MACRO
         jmp menuFunc
 
     insertFunc:
-        clearBuffer bufferOption
+        clearBuffer bufferFunction
         clearTerminal
         print msgInsertFunc
-        readUntilEnter bufferOption
+        readUntilEnter bufferFunction
         verifyFunction
         jmp menuFunc
 
     chargeFileFunc:
         clearTerminal
         print msgChargeFileFunc
-        readUntilEnter bufferOption
+        readUntilEnter bufferFunction
         jmp menuFunc
     
     fin:
 ENDM
 
 verifyFunction MACRO
-    local ciclo, ok, fin, error
+    local ciclo, ok, fin, error, follow
 
-    cmp bufferOption[0], "x"
-    je ok
-    cmp bufferOption[0], "+"
-    je ok
-    cmp bufferOption[0], "-"
-    je ok
-    
-    TextToDecimal bufferOption[0], number1n
-    cmp number1n, 0
-    je error
+    xor si, si
+    mov counter, 0
+    ciclo:
+        mov bl, bufferFunction[si]
+        mov wordIndividual, bl
+
+        cmp wordIndividual, 78h ; Compare si es x
+        je follow
+        cmp wordIndividual, 2bh ; Compara si es +
+        je follow
+        cmp wordIndividual, 2dh ; Compara si es -
+        je follow
+
+        TextToDecimal wordIndividual, number1n
+        cmp number1n, 0
+        je error
+
+    follow:
+        mov si, counter
+        cmp bufferFunction[si+1], 24h
+        je ok
+        inc si
+        add counter, 1
+        jmp ciclo
     
     ok:
         print test_info
         readUntilEnter bufferKey
         clearBuffer bufferMenuFunc
+        clearBuffer bufferFunction
         jmp fin
-    ; xor si, si
-    ; ciclo:
-    ;     xor bx, bx
-    ;     mov bl, bufferMenuFunc[si]
-    ;     printRegister bl
-    ;     inc si
-    ;     cmp bufferMenuFunc[si], "$"
-    ;     jne ciclo
 
     error:
         print msgInputNotValid

@@ -20,11 +20,14 @@ include macros.asm
     msgChargeFileFunc db "Ingrese archivo de carga de funciones $"
     msgInputNotValid db "Entrada no valida $"
     test_info db "Aqui todo bien $"
+    space db " ", "$"
     
     bufferRoute db 20 dup("$"), 0
     bufferMenuFunc db 20 dup("$"), 0
-    bufferOption db 20 dup("$"), 0
+    bufferFunction db 20 dup("$"), 0
     bufferKey db 20 dup("$"), 0
+    wordIndividual db 20 dup("$"), 0
+    counter dw 0
     number1n dw ?
     resultado dw ?
 .code
