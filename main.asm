@@ -9,8 +9,8 @@ include files.asm
                 0ah,0dh,'Grupo no.6',
                 0ah,0dh,'Proyecto no.2',
                 0ah, 0dh,'-- Menu Principal --',
-                0ah,0dh,'1. (dID) Derivar funcion',
-                0ah,0dh,'Ingrese nombre de archivo de entrada o X si desea salir:',
+                0ah,0dh,'-- 1. (dID) Derivar funcion',
+                0ah,0dh,'-- Ingrese nombre de archivo de entrada o X si desea salir:',
                 0ah,0dh,'$'
 
     headersMenuFunc db 0ah, 0dh, '--- Menu de Funciones ---',

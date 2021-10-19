@@ -371,7 +371,7 @@ loadMenuFunction MACRO
         clearTerminal
         print msgInsertFunc
         readUntilEnter bufferFunction
-        verifyFunction
+        verifyFunction bufferFunction
         jmp menuFunc
 
     chargeFileFunc:
@@ -385,7 +385,7 @@ loadMenuFunction MACRO
 ENDM
 
 loadFile MACRO nameRoute
-    local ciclo
+    local ciclo0, ciclo1, validateFunc, exit
 
     openFile nameRoute
     readFile
@@ -393,23 +393,39 @@ loadFile MACRO nameRoute
     ; PrintText bufferFile
     ; readUntilEnter bufferKey
 
-    xor si, si
-    ciclo:
-        cmp bufferFile[si], 3bh ; Compara con ;
-        je validateFunc
-        inc si
-        jmp ciclo
-
-    validateFunc:
+    xor di, di
+    ciclo0:
+        xor si, si
+        xor ax, ax
+        clearBuffer funcIndividual
+        ciclo1:
+            mov ah, bufferFile[di]
+            mov funcIndividual[si], ah
+            inc di
+            inc si
+            cmp bufferFile[di], 24h
+            je exit
+            cmp bufferFile[di], 3bh
+            jne ciclo1
+        print breakLine
+        PrintText funcIndividual
+        readUntilEnter bufferKey
+        inc di
+        cmp bufferFile[di], 24h
+        jne ciclo0
+    exit:
+        print breakLine
+        PrintText funcIndividual
+        readUntilEnter bufferKey
 ENDM
 
-verifyFunction MACRO
+verifyFunction MACRO funcParam
     local ciclo, ok, fin, error, follow
 
     xor si, si
     mov counter, 0
     ciclo:
-        mov bl, bufferFunction[si]
+        mov bl, funcParam[si]
         mov wordIndividual, bl
 
         cmp wordIndividual, 78h ; Compara si es x
@@ -427,7 +443,7 @@ verifyFunction MACRO
 
     follow:
         mov si, counter
-        cmp bufferFunction[si+1], 24h
+        cmp funcParam[si+1], 24h
         je ok
         inc si
         add counter, 1
@@ -439,13 +455,13 @@ verifyFunction MACRO
         DecimalToText dictKey, resultado
         print space
         print msgValGenerated
-        PrintText bufferFunction
+        PrintText funcParam
         
         ; Guardar en diccionario
-        keepOnTable
+        keepOnTable funcParam
 
         clearBuffer bufferMenuFunc
-        clearBuffer bufferFunction
+        clearBuffer funcParam
         jmp fin
 
     error:
@@ -456,7 +472,7 @@ verifyFunction MACRO
     fin:
 ENDM
 
-keepOnTable MACRO params
+keepOnTable MACRO funcParam
     local ciclo, fin, continue
 
     mov dictTable[0], 5fh
@@ -472,9 +488,9 @@ keepOnTable MACRO params
     mov si, 3
     mov counterTable, 3
     ciclo:
-        mov cl, bufferFunction[di]
+        mov cl, funcParam[di]
         mov dictTable[si], cl
-        cmp bufferFunction[di+1], 24h
+        cmp funcParam[di+1], 24h
         je continue
         inc di
         inc si
