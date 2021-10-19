@@ -378,9 +378,29 @@ loadMenuFunction MACRO
         clearTerminal
         print msgChargeFileFunc
         readUntilEnter bufferFunction
+        loadFile bufferFunction
         jmp menuFunc
     
     fin:
+ENDM
+
+loadFile MACRO nameRoute
+    local ciclo
+
+    openFile nameRoute
+    readFile
+    closeFile
+    ; PrintText bufferFile
+    ; readUntilEnter bufferKey
+
+    xor si, si
+    ciclo:
+        cmp bufferFile[si], 3bh ; Compara con ;
+        je validateFunc
+        inc si
+        jmp ciclo
+
+    validateFunc:
 ENDM
 
 verifyFunction MACRO

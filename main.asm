@@ -1,4 +1,5 @@
 include macros.asm
+include files.asm
 
 .model small
 .stack 100h
@@ -29,12 +30,14 @@ include macros.asm
     space db " ", "$"
     breakLine db " $", 13, 10
 
+    bufferFile db 1000 dup("$"), "$"
     bufferRoute db 20 dup("$"), 0
     bufferMenuFunc db 20 dup("$"), 0
     bufferFunction db 20 dup("$"), 0
     bufferKey db 20 dup("$"), 0
-    wordIndividual db 20 dup("$"), 0
     bufferId db 2 dup("$"), 0
+    wordIndividual db 20 dup("$"), 0
+    funcIndividual db 20 dup("$"), 0
 
     dictTable db 200 dup("$"), 0
     dictKey dw 0
@@ -44,6 +47,7 @@ include macros.asm
     counterTable dw 0
     number1n dw ?
     resultado dw ?
+    handle dw ?, 0
 .code
     ;description
     main PROC
