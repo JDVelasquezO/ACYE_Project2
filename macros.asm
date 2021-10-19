@@ -24,6 +24,20 @@ printRegister macro register
 	pop ax
 endm
 
+DecimalToAscii macro register
+    push ax
+    push dx
+
+    mov dl, register
+    add dl, 97
+    mov resultado, dl
+    mov ah, 02h
+    int 21h
+    
+    pop dx
+    pop ax
+endm
+
 ImprimirEspacio macro registro
 	push ax
 	push dx
@@ -167,19 +181,6 @@ convertir8bits macro param
     
     dec bx
     jnz noz
-endm
-
-printRegister macro register
-	push ax
-	push dx
-	
-	mov dl,register
-	add dl,48 		; Se le suma 48 por el codigo ascii
-	mov ah,02h
-	int 21h
-	
-	pop dx
-	pop ax
 endm
 
 ImprimirNumero macro registro
@@ -458,8 +459,14 @@ verifyFunction MACRO funcParam
     
     ok:
         ; Imprimir llave y valor
+        xor dx, dx
         print msgKeyGenerated
-        DecimalToText dictKey, resultado
+        
+        ; mov bl, dictKey
+        DecimalToAscii dictKey
+        ; printRegister dl
+        ; PrintText dictKey
+
         print space
         print msgValGenerated
         PrintText funcParam
@@ -487,10 +494,10 @@ keepOnTable MACRO funcParam
     mov bx, counterExternTable
 
     cmp counterExternTable, 0
-    je putFirstUnderscore
+    je putFirstUnderscore   ; Ir a Meter el primer _
     
     returnFirstUnderscore:
-        mov ax, resultado
+        mov al, resultado
         mov dictTable[bx], al   ; Meter el primer ID
         inc bx
         add counterExternTable, 1
@@ -532,12 +539,11 @@ keepOnTable MACRO funcParam
         readUntilEnter bufferKey
 ENDM
 
-lookForFunction MACRO
+lookForFunction MACRO idParam
     local ciclo, incId, idFound, ciclo1
-
-    xor si, si
-    mov bl, bufferRoute[1]
     
+    xor si, si
+    mov bl, idParam
     ciclo:
         cmp dictTable[si], 5fh
         jne incId

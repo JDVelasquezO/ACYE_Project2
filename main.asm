@@ -40,7 +40,7 @@ include files.asm
     funcIndividual db 20 dup("$"), 0
 
     dictTable db 200 dup("$"), 0
-    dictKey dw 0
+    dictKey db 0
     dictKeyString db 2 dup("$"), 0
 
     counter dw 0
@@ -48,7 +48,7 @@ include files.asm
     counterChars dw 0
     counterExternTable dw 0
     number1n dw ?
-    resultado dw ?
+    resultado db ?
     handle dw ?, 0
 .code
     ;description
@@ -79,7 +79,7 @@ include files.asm
 
         derivateFunc:
             clearTerminal
-            lookForFunction
+            lookForFunction bufferRoute[1]
             jmp menu
         
         exitGame:
