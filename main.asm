@@ -27,6 +27,9 @@ include macros.asm
     bufferFunction db 20 dup("$"), 0
     bufferKey db 20 dup("$"), 0
     wordIndividual db 20 dup("$"), 0
+
+    bufferFunctions db 20 dup("$"), 0
+
     counter dw 0
     number1n dw ?
     resultado dw ?

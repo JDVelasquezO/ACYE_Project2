@@ -392,11 +392,13 @@ verifyFunction MACRO
         mov bl, bufferFunction[si]
         mov wordIndividual, bl
 
-        cmp wordIndividual, 78h ; Compare si es x
+        cmp wordIndividual, 78h ; Compara si es x
         je follow
         cmp wordIndividual, 2bh ; Compara si es +
         je follow
         cmp wordIndividual, 2dh ; Compara si es -
+        je follow
+        cmp wordIndividual, 5eh ; Compara si es ^
         je follow
 
         TextToDecimal wordIndividual, number1n
