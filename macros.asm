@@ -510,6 +510,7 @@ keepOnTable MACRO funcParam
         xor cx, cx
         mov si, bx
         mov counterTable, bx
+
         ciclo:
             mov cl, funcParam[di]
             mov dictTable[si], cl
@@ -540,7 +541,7 @@ keepOnTable MACRO funcParam
 ENDM
 
 lookForFunction MACRO idParam
-    local ciclo, incId, idFound, ciclo1
+    local ciclo, incId, idFound, ciclo1, printMsgFound, notFound, fin
     
     xor si, si
     mov bl, idParam
@@ -557,6 +558,8 @@ lookForFunction MACRO idParam
 
     incId:
         inc si
+        cmp dictTable[si], 24h
+        je notFound
         jmp ciclo
 
     idFound:
@@ -576,4 +579,11 @@ lookForFunction MACRO idParam
         PrintText msgFuncFound
         PrintText funcIndividual
         readUntilEnter bufferKey
+        jmp fin
+
+    notFound:
+        PrintText msgFuncNotFound
+        readUntilEnter bufferKey
+
+    fin:
 ENDM

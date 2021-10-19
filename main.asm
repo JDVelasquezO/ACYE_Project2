@@ -26,6 +26,7 @@ include files.asm
     msgValGenerated db "Valor: $"
     msgDerivative db "Ingresar el id de la funcion a derivar: $"
     msgFuncFound db "Funcion encontrada: $"
+    msgFuncNotFound db "Funcion no encontrada $"
     test_info db "Aqui todo bien $"
     space db " ", "$"
     breakLine db " $", 13, 10
