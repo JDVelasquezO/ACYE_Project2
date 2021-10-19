@@ -469,6 +469,7 @@ verifyFunction MACRO funcParam
 
         clearBuffer bufferMenuFunc
         clearBuffer funcParam
+        add dictKey, 1
         jmp fin
 
     error:
@@ -480,33 +481,50 @@ verifyFunction MACRO funcParam
 ENDM
 
 keepOnTable MACRO funcParam
-    local ciclo, fin, continue
+    local ciclo, fin, continue, putFirstUnderscore, returnFirstUnderscore
 
-    mov dictTable[0], 5fh
+    xor bx, bx
+    mov bx, counterExternTable
+
+    cmp counterExternTable, 0
+    je putFirstUnderscore
     
-    mov ax, resultado
-    mov dictTable[1], al
+    returnFirstUnderscore:
+        mov ax, resultado
+        mov dictTable[bx], al   ; Meter el primer ID
+        inc bx
+        add counterExternTable, 1
+        mov dictTable[bx], 5fh  ; Meter el segundo _
+        inc bx                  ; bx toma el tercer valor
+        add counterExternTable, 1
 
-    mov dictTable[2], 5fh
-
-    xor si, si
-    xor di, di
-    xor cx, cx
-    mov si, 3
-    mov counterTable, 3
-    ciclo:
-        mov cl, funcParam[di]
-        mov dictTable[si], cl
-        cmp funcParam[di+1], 24h
-        je continue
-        inc di
-        inc si
-        add counterTable, 1
-        jmp ciclo
+        xor si, si
+        xor di, di
+        xor cx, cx
+        mov si, bx
+        mov counterTable, bx
+        ciclo:
+            mov cl, funcParam[di]
+            mov dictTable[si], cl
+            add counterExternTable, 1
+            cmp funcParam[di+1], 24h
+            je continue
+            inc di
+            inc si
+            add counterTable, 1
+            jmp ciclo
 
     continue:
         inc si
         mov dictTable[si], 5fh
+        add counterExternTable, 1
+        jmp fin
+
+    putFirstUnderscore:
+        mov dictTable[bx], 5fh  ; Meter el primer _
+        inc bx
+        add counterExternTable, 1
+        jmp returnFirstUnderscore
 
     fin:
         print breakLine
