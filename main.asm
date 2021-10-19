@@ -23,18 +23,20 @@ include macros.asm
     msgValGenerated db "Valor: $"
     test_info db "Aqui todo bien $"
     space db " ", "$"
-    
+    breakLine db " $", 13, 10
+
     bufferRoute db 20 dup("$"), 0
     bufferMenuFunc db 20 dup("$"), 0
     bufferFunction db 20 dup("$"), 0
     bufferKey db 20 dup("$"), 0
     wordIndividual db 20 dup("$"), 0
 
-    dictTable dw 200 dup("$"), 0
+    dictTable db 200 dup("$"), 0
     dictKey dw 0
-    dictKeyString dw 2 dup("$"), 0
+    dictKeyString db 2 dup("$"), 0
 
     counter dw 0
+    counterTable dw 0
     number1n dw ?
     resultado dw ?
 .code

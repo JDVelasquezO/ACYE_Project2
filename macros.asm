@@ -440,28 +440,35 @@ keepOnTable MACRO params
 
     mov dictTable[0], 5fh
     
-    mov ax, resultado
-    mov dictKeyString, ax
-    mov bx, dictKeyString[0]
-    mov dictTable[1], bx
+    ; mov ax, resultado
+    
+    ; mov dictKeyString, ax
+    ; mov bx, dictKeyString[0]
+    mov dictTable[1], 30h
 
     mov dictTable[2], 5fh
 
-    ; xor si, si
-    ; xor di, di
-    ; xor bx, bx
-    ; mov si, 3
-    ; ciclo:
-    ;     mov bl, bufferFunction[di]
-    ;     mov dictTable[si], bl
-    ;     cmp bufferFunction[di+1], 24h
-    ;     je fin
-    ;     inc di
-    ;     inc si
-    ;     jmp ciclo
+    xor si, si
+    xor di, di
+    xor cx, cx
+    mov si, 3
+    mov counterTable, 3
+    ciclo:
+        mov cl, bufferFunction[di]
+        mov dictTable[si], cl
+        cmp bufferFunction[di+1], 24h
+        je continue
+        inc di
+        inc si
+        add counterTable, 1
+        jmp ciclo
+
+    continue:
+        inc si
+        mov dictTable[si], 5fh
 
     fin:
-        print space
+        print breakLine
         PrintText dictTable
         readUntilEnter bufferKey
 ENDM
