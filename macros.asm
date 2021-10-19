@@ -394,6 +394,7 @@ loadFile MACRO nameRoute
     ; readUntilEnter bufferKey
 
     xor di, di
+    mov counterChars, 0
     ciclo0:
         xor si, si
         xor ax, ax
@@ -403,25 +404,31 @@ loadFile MACRO nameRoute
             mov funcIndividual[si], ah
             inc di
             inc si
+            add counterChars, 1
             cmp bufferFile[di], 24h
             je exit
             cmp bufferFile[di], 3bh
             jne ciclo1
         print breakLine
-        PrintText funcIndividual
-        readUntilEnter bufferKey
-        inc di
+        verifyFunction funcIndividual
+        ; readUntilEnter bufferKey
+        xor di, di
+        add counterChars, 1
+        mov di, counterChars
+        
         cmp bufferFile[di], 24h
         jne ciclo0
     exit:
         print breakLine
-        PrintText funcIndividual
-        readUntilEnter bufferKey
+        verifyFunction funcIndividual
+        ; readUntilEnter bufferKey
 ENDM
 
 verifyFunction MACRO funcParam
     local ciclo, ok, fin, error, follow
 
+    PrintText funcParam
+    readUntilEnter bufferKey
     xor si, si
     mov counter, 0
     ciclo:

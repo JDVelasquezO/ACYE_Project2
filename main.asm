@@ -45,6 +45,7 @@ include files.asm
 
     counter dw 0
     counterTable dw 0
+    counterChars dw 0
     number1n dw ?
     resultado dw ?
     handle dw ?, 0
