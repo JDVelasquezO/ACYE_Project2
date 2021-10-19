@@ -427,8 +427,8 @@ ENDM
 verifyFunction MACRO funcParam
     local ciclo, ok, fin, error, follow
 
-    PrintText funcParam
-    readUntilEnter bufferKey
+    ; PrintText funcParam
+    ; readUntilEnter bufferKey
     xor si, si
     mov counter, 0
     ciclo:
@@ -532,9 +532,12 @@ keepOnTable MACRO funcParam
         readUntilEnter bufferKey
 ENDM
 
-lookForFunction MACRO params
+lookForFunction MACRO
+    local ciclo, incId, idFound, ciclo1
+
     xor si, si
     mov bl, bufferRoute[1]
+    
     ciclo:
         cmp dictTable[si], 5fh
         jne incId
@@ -551,8 +554,20 @@ lookForFunction MACRO params
         jmp ciclo
 
     idFound:
+        clearBuffer funcIndividual
+        xor cx, cx
+        xor di, di
+        ciclo1:
+            inc si
+            mov cl, dictTable[si]
+            mov funcIndividual[di], cl
+            cmp dictTable[si+1], 5fh
+            je printMsgFound
+            inc di
+            jmp ciclo1
+
+    printMsgFound:
         PrintText msgFuncFound
-        print breakLine
-        PrintText dictTable[si+1]
+        PrintText funcIndividual
         readUntilEnter bufferKey
 ENDM
