@@ -6,11 +6,11 @@ include files.asm
 .data
     headers db 	0ah,0dh,'Universidad de San Carlos de Guatemala',
                 0ah,0dh,'Arquitectura de Computadores y Ensambladores 1',
-                0ah,0dh,'Grupo no.6',
                 0ah, 0dh,'-- Menu Principal --',
-                0ah,0dh,'-- (dID) Derivar funcion',
-                0ah,0dh,'-- (iID) Integrar funcion',
-                0ah,0dh,'-- (func) Menu funciones',
+                0ah,0dh,'-- (dID) Derivar funcion --',
+                0ah,0dh,'-- (iID) Integrar funcion --',
+                0ah,0dh,'-- (func) Ingresar funciones --',
+                0ah,0dh,'-- (print) Imprimir funciones --',
                 0ah,0dh,'-- (x) Salir',
                 0ah,0dh,'$'
 
@@ -29,6 +29,7 @@ include files.asm
     msgFuncFound db "Funcion encontrada: $"
     msgFuncNotFound db "Funcion no encontrada $"
     test_info db "Aqui todo bien $"
+    twoPonts db ": $"
     space db " ", "$"
     breakLine db " $", 13, 10
 
@@ -68,10 +69,13 @@ include files.asm
             je exitGame
             cmp bufferRoute[0], 'X'
             je exitGame
+
             cmp bufferRoute[0], 'd'
             je derivateFunc
             cmp bufferRoute[0], 'f'
             je menuFunction
+            cmp bufferRoute[0], 'p'
+            je printFunctions
             jmp menu
 
         menuFunction:
@@ -82,6 +86,12 @@ include files.asm
         derivateFunc:
             clearTerminal
             lookForFunction bufferRoute[1]
+            jmp menu
+
+        printFunctions:
+            clearTerminal
+            printFuncs
+            readUntilEnter bufferKey
             jmp menu
         
         exitGame:

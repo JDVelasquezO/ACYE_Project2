@@ -536,7 +536,7 @@ keepOnTable MACRO funcParam
     fin:
         print breakLine
         PrintText dictTable
-        readUntilEnter bufferKey
+        ; readUntilEnter bufferKey
 ENDM
 
 lookForFunction MACRO idParam
@@ -585,4 +585,37 @@ lookForFunction MACRO idParam
         readUntilEnter bufferKey
 
     fin:
+ENDM
+
+printFuncs MACRO params
+    local ciclo0, ciclo1, exit
+
+    xor di, di
+    mov counterChars, 0
+    ciclo0:
+        xor si, si
+        xor ax, ax
+        clearBuffer funcIndividual
+        ciclo1:
+            mov ah, dictTable[di]
+            mov funcIndividual[si], ah
+            inc di
+            inc si
+            add counterChars, 1
+            cmp dictTable[di], 24h
+            je exit
+            cmp dictTable[di], 5fh
+            jne ciclo1
+        print breakLine
+        PrintText funcIndividual
+        ; readUntilEnter bufferKey
+        xor di, di
+        add counterChars, 1
+        mov di, counterChars
+        
+        cmp dictTable[di], 24h
+        jne ciclo0
+    exit:
+        print breakLine
+        PrintText funcIndividual
 ENDM
