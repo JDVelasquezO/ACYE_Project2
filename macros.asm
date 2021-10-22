@@ -660,6 +660,7 @@ evaluateExpr MACRO expr
 
     xor ax, ax
     xor di, di
+    clearBuffer coefficient
 
     cmp expr[0], 78h    ; Se compara con x
     je assignCoefficient
@@ -694,15 +695,28 @@ evaluateExpr MACRO expr
 
     searchExponent:
         mov bl, expr[di+1]
+        add bl, 1
         mov exponent, bl
+        TextToDecimal exponent, number3n
 
     continue:
-        ; TextToDecimal coefficient, number1n
-        ; mov ax, number1n
-        PrintText coefficient
-        print space
+        ; mov number2n, 0
+        xor cx, cx
+        xor ax, ax
+        
+        TextToDecimal coefficient, number1n
+        mov ax, number1n
+        mov cx, number3n
+        div cl
+        
+        mov number2n, ax
+        PrintText msgResIntegral
+        DecimalToText number2n, resultado2  ; Imprime coeficiente
+        PrintText literal
+        PrintText raisedTo
         PrintText exponent
-        readUntilEnter bufferKey
+        PrintText addSign
+        ; readUntilEnter bufferKey
         jmp fin
 
     nonExponent:

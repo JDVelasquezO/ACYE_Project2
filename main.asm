@@ -29,6 +29,7 @@ include files.asm
     msgFuncFound db "Funcion encontrada: $"
     msgFuncNotFound db "Funcion no encontrada $"
     test_info db "Aqui todo bien $"
+    msgResIntegral db "La integral es: $"
     twoPonts db ": $"
     space db " ", "$"
     breakLine db " $", 13, 10
@@ -43,9 +44,14 @@ include files.asm
     funcIndividual db 20 dup("$"), 0
     expression db 10 dup("$"), 0
     coefficient db 3 dup("$"), 0
+    resultCoefficient db 5 dup("$")
+    resultExponent db 0
     exponent db 3 dup("$"), 0
     integratedExpr db 20 dup("$"), 0
     literal db "x $"
+    raisedTo db "^ $"
+    addSign db "+ $"
+    lessSign db "- $"
     constant db "+C $"
 
     dictTable db 200 dup("$"), 0
@@ -57,7 +63,10 @@ include files.asm
     counterChars dw 0
     counterExternTable dw 0
     number1n dw ?
+    number2n dw ?
+    number3n dw ?
     resultado db ?
+    resultado2 dw ?
     handle dw ?, 0
 .code
     ;description
