@@ -604,7 +604,7 @@ printFuncs MACRO params
             add counterChars, 1
             cmp dictTable[di], 24h
             je exit
-            cmp dictTable[di], 5fh
+            cmp dictTable[di], 5fh  ; Compara si es _
             jne ciclo1
         print breakLine
         PrintText funcIndividual
@@ -618,4 +618,43 @@ printFuncs MACRO params
     exit:
         print breakLine
         PrintText funcIndividual
+ENDM
+
+integration MACRO
+    local ciclo0, ciclo1, exit
+    ; PrintText funcIndividual
+    xor di, di
+    mov counterChars, 0
+    ciclo0:
+        xor si, si
+        xor ax, ax
+        clearBuffer expression
+        ciclo1:
+            mov ah, funcIndividual[di]
+            mov expression[si], ah
+            inc di
+            inc si
+            add counterChars, 1
+            cmp funcIndividual[di], 24h
+            je exit
+            cmp funcIndividual[di], 2bh ; Compara si es +
+            je continue
+            cmp funcIndividual[di], 2dh ; Compara si es -
+            je continue
+            jmp ciclo1
+
+        continue:
+            print breakLine
+            PrintText expression
+            readUntilEnter bufferKey
+            xor di, di
+            add counterChars, 1
+            mov di, counterChars
+            
+            cmp funcIndividual[di], 24h
+            jne ciclo0
+    exit:
+        print breakLine
+        PrintText expression
+        readUntilEnter bufferKey
 ENDM

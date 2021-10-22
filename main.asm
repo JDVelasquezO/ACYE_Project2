@@ -41,6 +41,7 @@ include files.asm
     bufferId db 2 dup("$"), 0
     wordIndividual db 20 dup("$"), 0
     funcIndividual db 20 dup("$"), 0
+    expression db 10 dup("$"), 0
 
     dictTable db 200 dup("$"), 0
     dictKey db 0
@@ -72,6 +73,8 @@ include files.asm
 
             cmp bufferRoute[0], 'd'
             je derivateFunc
+            cmp bufferRoute[0], 'i'
+            je integrateFunc
             cmp bufferRoute[0], 'f'
             je menuFunction
             cmp bufferRoute[0], 'p'
@@ -86,6 +89,12 @@ include files.asm
         derivateFunc:
             clearTerminal
             lookForFunction bufferRoute[1]
+            jmp menu
+
+        integrateFunc:
+            clearTerminal
+            lookForFunction bufferRoute[1]
+            integration
             jmp menu
 
         printFunctions:
