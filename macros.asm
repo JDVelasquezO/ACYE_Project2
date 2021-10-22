@@ -656,7 +656,7 @@ integration MACRO func
 ENDM
 
 evaluateExpr MACRO expr
-    local assignCoefficient, searchCoefficient, continue
+    local assignCoefficient, searchCoefficient, continue, defineExponent, setExponent, searchExponent, nonExponent, fin
 
     xor ax, ax
     xor di, di
@@ -674,13 +674,42 @@ evaluateExpr MACRO expr
         mov coefficient[di], al
         inc di
         cmp expr[di], 24h
-        je continue
+        je defineExponent
         cmp expr[di], 78h
         jne searchCoefficient
 
+    defineExponent:
+        xor bx, bx
+        inc di
+        cmp expr[di], 24h
+        je nonExponent
+        cmp expr[di], 5eh   ; Se compara la sig posicion a x con ^
+        je searchExponent   ; Si existe, se busca el numero
+        jmp setExponent     ; Si no existe, se setea un 1
+
+    setExponent:
+        mov bl, 1d
+        mov exponent, 1d
+        jmp continue
+
+    searchExponent:
+        mov bl, expr[di+1]
+        mov exponent, bl
+
     continue:
-        TextToDecimal coefficient, number1n
+        ; TextToDecimal coefficient, number1n
+        ; mov ax, number1n
         PrintText coefficient
+        print space
+        PrintText exponent
+        readUntilEnter bufferKey
+        jmp fin
+
+    nonExponent:
+        PrintText coefficient
+        PrintText literal
+        PrintText constant
         readUntilEnter bufferKey
 
+    fin:
 ENDM

@@ -43,6 +43,10 @@ include files.asm
     funcIndividual db 20 dup("$"), 0
     expression db 10 dup("$"), 0
     coefficient db 3 dup("$"), 0
+    exponent db 3 dup("$"), 0
+    integratedExpr db 20 dup("$"), 0
+    literal db "x $"
+    constant db "+C $"
 
     dictTable db 200 dup("$"), 0
     dictKey db 0
