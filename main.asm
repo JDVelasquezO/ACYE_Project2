@@ -52,7 +52,9 @@ include files.asm
     raisedTo db "^ $"
     addSign db "+ $"
     lessSign db "- $"
-    constant db "+C $"
+    constant db "C $"
+    resIntegral db 20 dup("$"), 0
+    counterResIntegral db 0
 
     dictTable db 200 dup("$"), 0
     dictKey db 0
@@ -67,6 +69,7 @@ include files.asm
     number3n dw ?
     resultado db ?
     resultado2 dw ?
+    resultado3 dw ?
     handle dw ?, 0
 .code
     ;description
@@ -108,7 +111,10 @@ include files.asm
         integrateFunc:
             clearTerminal
             lookForFunction bufferRoute[1]
+            PrintText msgResIntegral
             integration funcIndividual
+            PrintText constant
+            readUntilEnter bufferKey
             jmp menu
 
         printFunctions:

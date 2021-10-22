@@ -544,6 +544,7 @@ lookForFunction MACRO idParam
     
     xor si, si
     mov bl, idParam
+    mov counterResIntegral, 0
     ciclo:
         cmp dictTable[si], 5fh
         jne incId
@@ -683,14 +684,15 @@ evaluateExpr MACRO expr
         xor bx, bx
         inc di
         cmp expr[di], 24h
-        je nonExponent
+        je setExponent
         cmp expr[di], 5eh   ; Se compara la sig posicion a x con ^
         je searchExponent   ; Si existe, se busca el numero
-        jmp setExponent     ; Si no existe, se setea un 1
+        ; jmp setExponent     ; Si no existe, se setea un 1
 
     setExponent:
-        mov bl, 1d
-        mov exponent, 1d
+        mov bx, 1d
+        add bx, 1
+        mov number3n, bx
         jmp continue
 
     searchExponent:
@@ -710,20 +712,17 @@ evaluateExpr MACRO expr
         div cl
         
         mov number2n, ax
-        PrintText msgResIntegral
         DecimalToText number2n, resultado2  ; Imprime coeficiente
         PrintText literal
         PrintText raisedTo
-        PrintText exponent
+        DecimalToText number3n, resultado3
         PrintText addSign
-        ; readUntilEnter bufferKey
         jmp fin
 
     nonExponent:
         PrintText coefficient
         PrintText literal
-        PrintText constant
-        readUntilEnter bufferKey
+        PrintText addSign
 
     fin:
 ENDM
