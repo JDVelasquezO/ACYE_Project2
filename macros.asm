@@ -657,12 +657,22 @@ integration MACRO func
 ENDM
 
 evaluateExpr MACRO expr
-    local assignCoefficient, searchCoefficient, continue, defineExponent, setExponent, searchExponent, nonExponent, fin
+    local ciclo, follow, assignCoefficient, searchCoefficient, continue, defineExponent, setExponent, searchExponent, nonExponent, fin
 
     xor ax, ax
     xor di, di
     clearBuffer coefficient
 
+    xor si, si
+    ciclo:
+        cmp expr[si], 78h
+        je follow
+        cmp expr[si], 24h
+        je nonExponent
+        inc si
+        jmp ciclo
+    
+    follow:
     cmp expr[0], 78h    ; Se compara con x
     je assignCoefficient
     jmp searchCoefficient
@@ -677,7 +687,7 @@ evaluateExpr MACRO expr
         inc di
         cmp expr[di], 24h
         je defineExponent
-        cmp expr[di], 78h
+        cmp expr[di], 78h       ; Se compara con x
         jne searchCoefficient
 
     defineExponent:
@@ -720,7 +730,7 @@ evaluateExpr MACRO expr
         jmp fin
 
     nonExponent:
-        PrintText coefficient
+        PrintText expr
         PrintText literal
         PrintText addSign
 
