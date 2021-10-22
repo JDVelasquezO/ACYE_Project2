@@ -55,6 +55,7 @@ include files.asm
     constant db "C $"
     resIntegral db 20 dup("$"), 0
     counterResIntegral db 0
+    capturedSign db 2 dup("$"), 0
 
     dictTable db 200 dup("$"), 0
     dictKey db 0

@@ -645,6 +645,9 @@ integration MACRO func
             jmp ciclo1
 
         continue:
+            xor dx, dx
+            mov dl, func[di]
+            mov capturedSign, dl
             evaluateExpr expression
             xor di, di
             add counterChars, 1
@@ -726,7 +729,7 @@ evaluateExpr MACRO expr
         PrintText literal
         PrintText raisedTo
         DecimalToText number3n, resultado3
-        PrintText addSign
+        PrintText capturedSign
         jmp fin
 
     nonExponent:
