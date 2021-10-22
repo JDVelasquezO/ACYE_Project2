@@ -620,7 +620,7 @@ printFuncs MACRO params
         PrintText funcIndividual
 ENDM
 
-integration MACRO
+integration MACRO func
     local ciclo0, ciclo1, exit
     ; PrintText funcIndividual
     xor di, di
@@ -630,31 +630,57 @@ integration MACRO
         xor ax, ax
         clearBuffer expression
         ciclo1:
-            mov ah, funcIndividual[di]
+            mov ah, func[di]
             mov expression[si], ah
             inc di
             inc si
             add counterChars, 1
-            cmp funcIndividual[di], 24h
+            cmp func[di], 24h
             je exit
-            cmp funcIndividual[di], 2bh ; Compara si es +
+            cmp func[di], 2bh ; Compara si es +
             je continue
-            cmp funcIndividual[di], 2dh ; Compara si es -
+            cmp func[di], 2dh ; Compara si es -
             je continue
             jmp ciclo1
 
         continue:
-            print breakLine
-            PrintText expression
-            readUntilEnter bufferKey
+            evaluateExpr expression
             xor di, di
             add counterChars, 1
             mov di, counterChars
             
-            cmp funcIndividual[di], 24h
+            cmp func[di], 24h
             jne ciclo0
     exit:
-        print breakLine
-        PrintText expression
+        evaluateExpr expression
+ENDM
+
+evaluateExpr MACRO expr
+    local assignCoefficient, searchCoefficient, continue
+
+    xor ax, ax
+    xor di, di
+
+    cmp expr[0], 78h    ; Se compara con x
+    je assignCoefficient
+    jmp searchCoefficient
+
+    assignCoefficient:
+        mov ax, 1d
+        jmp continue
+
+    searchCoefficient:
+        mov al, expr[di]
+        mov coefficient[di], al
+        inc di
+        cmp expr[di], 24h
+        je continue
+        cmp expr[di], 78h
+        jne searchCoefficient
+
+    continue:
+        TextToDecimal coefficient, number1n
+        PrintText coefficient
         readUntilEnter bufferKey
+
 ENDM

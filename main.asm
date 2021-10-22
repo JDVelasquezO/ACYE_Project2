@@ -42,6 +42,7 @@ include files.asm
     wordIndividual db 20 dup("$"), 0
     funcIndividual db 20 dup("$"), 0
     expression db 10 dup("$"), 0
+    coefficient db 3 dup("$"), 0
 
     dictTable db 200 dup("$"), 0
     dictKey db 0
@@ -94,7 +95,7 @@ include files.asm
         integrateFunc:
             clearTerminal
             lookForFunction bufferRoute[1]
-            integration
+            integration funcIndividual
             jmp menu
 
         printFunctions:
