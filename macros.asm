@@ -617,13 +617,13 @@ printFuncs MACRO params
         cmp dictTable[di], 24h
         jne ciclo0
     exit:
-        print breakLine
-        PrintText funcIndividual
+        ; print breakLine
+        ; PrintText funcIndividual
 ENDM
 
 integration MACRO func
     local ciclo0, ciclo1, exit
-    ; PrintText funcIndividual
+    mov capturedSign, 2bh
     xor di, di
     mov counterChars, 0
     ciclo0:
