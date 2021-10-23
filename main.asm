@@ -53,6 +53,7 @@ include files.asm
     addSign db "+ $"
     lessSign db "- $"
     constant db "C $"
+    over db "/ $"
     resIntegral db 20 dup("$"), 0
     counterResIntegral db 0
     capturedSign db 2 dup("$"), 0
