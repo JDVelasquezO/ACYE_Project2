@@ -660,7 +660,7 @@ integration MACRO func
 ENDM
 
 evaluateExpr MACRO expr
-    local ciclo, follow, assignCoefficient, searchCoefficient, continue, defineExponent, setExponent, searchExponent, nonExponent, fin
+    local ciclo, quitLessSign, follow, assignCoefficient, searchCoefficient, continue, defineExponent, setExponent, searchExponent, nonExponent, fin
 
     xor ax, ax
     xor di, di
@@ -676,9 +676,9 @@ evaluateExpr MACRO expr
         jmp ciclo
     
     follow:
-    cmp expr[0], 78h    ; Se compara con x
-    je assignCoefficient
-    jmp searchCoefficient
+        cmp expr[0], 78h    ; Se compara con x
+        je assignCoefficient
+        jmp searchCoefficient
 
     assignCoefficient:
         mov ax, 1d
@@ -691,7 +691,8 @@ evaluateExpr MACRO expr
         cmp expr[di], 24h
         je defineExponent
         cmp expr[di], 78h       ; Se compara con x
-        jne searchCoefficient
+        je defineExponent
+        jmp searchCoefficient
 
     defineExponent:
         xor bx, bx
@@ -722,13 +723,14 @@ evaluateExpr MACRO expr
         TextToDecimal coefficient, number1n
         mov ax, number1n
         mov cx, number3n
-        div cl
-        
+        cwd
+        idiv cx
+
         mov number2n, ax
         DecimalToText number2n, resultado2  ; Imprime coeficiente
         PrintText literal
         PrintText raisedTo
-        DecimalToText number3n, resultado3
+        DecimalToText number3n, resultado3  ; Imprime exponente
         PrintText capturedSign
         jmp fin
 
