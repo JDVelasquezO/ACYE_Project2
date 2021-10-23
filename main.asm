@@ -41,7 +41,7 @@ include files.asm
     bufferKey db 20 dup("$"), 0
     bufferId db 2 dup("$"), 0
     wordIndividual db 20 dup("$"), 0
-    funcIndividual db 20 dup("$"), 0
+    funcIndividual db 50 dup("$"), 0
     expression db 10 dup("$"), 0
     coefficient db 3 dup("$"), 0
     resultCoefficient db 5 dup("$")
