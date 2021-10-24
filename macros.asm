@@ -403,26 +403,30 @@ loadFile MACRO nameRoute
         ciclo1:
             mov ah, bufferFile[di]
             mov funcIndividual[si], ah
+
             inc di
             inc si
             add counterChars, 1
-            cmp bufferFile[di], 24h
-            je exit
             cmp bufferFile[di], 3bh
-            jne ciclo1
-        print breakLine
-        verifyFunction funcIndividual
-        ; readUntilEnter bufferKey
-        xor di, di
-        add counterChars, 1
-        mov di, counterChars
-        
-        cmp bufferFile[di], 24h
-        jne ciclo0
+            je verifyBreakLine
+            jmp ciclo1
+        ; print breakLine
+
+        verifyBreakLine:
+            verifyFunction funcIndividual
+            xor di, di
+            add counterChars, 1
+            mov di, counterChars
+            cmp bufferFile[di+1], 0ah
+            je incrementCounter
+            jmp exit
+
+        incrementCounter:
+            add counterChars, 2
+            mov di, counterChars
+            jmp ciclo0
+
     exit:
-        print breakLine
-        verifyFunction funcIndividual
-        ; readUntilEnter bufferKey
 ENDM
 
 verifyFunction MACRO funcParam
