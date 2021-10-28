@@ -626,7 +626,7 @@ printFuncs MACRO params
 ENDM
 
 integration MACRO func
-    local ciclo0, ciclo1, exit
+    local ciclo0, ciclo1, exit, continue
     mov capturedSign, 2bh
     xor di, di
     mov counterChars, 0
@@ -752,6 +752,141 @@ evaluateExpr MACRO expr
         PrintText raisedTo
         DecimalToText number3n, resultado3  ; Imprime exponente
         PrintText capturedSign
+        jmp fin
+
+    nonExponent:
+        PrintText expr
+        PrintText literal
+        PrintText addSign
+
+    fin:
+ENDM
+
+separateBySign MACRO func
+    local ciclo0, ciclo1, exit, continue
+    mov capturedSign, 2bh
+    xor di, di
+    mov counterChars, 0
+    ciclo0:
+        xor si, si
+        xor ax, ax
+        clearBuffer expression
+        ciclo1:
+            mov ah, func[di]
+            mov expression[si], ah
+            inc di
+            inc si
+            add counterChars, 1
+            cmp func[di], 24h
+            je exit
+            cmp func[di], 2bh ; Compara si es +
+            je continue
+            cmp func[di], 2dh ; Compara si es -
+            je continue
+            jmp ciclo1
+
+        continue:
+            xor dx, dx
+            mov dl, func[di]
+            mov capturedSign, dl
+            substituteVar expression
+            xor di, di
+            add counterChars, 1
+            mov di, counterChars
+            
+            cmp func[di], 24h
+            jne ciclo0
+    exit:
+        substituteVar expression
+ENDM
+
+substituteVar MACRO expr
+    local ciclo, ciclo2, printDivision, quitLessSign, follow, assignCoefficient, searchCoefficient, continue, defineExponent, setExponent, searchExponent, nonExponent, fin
+
+    xor ax, ax
+    xor di, di
+    clearBuffer coefficient
+
+    xor si, si
+    ciclo:  ; Ciclo para saber si viene al menos una x
+        cmp expr[si], 78h
+        je follow
+        cmp expr[si], 24h
+        je nonExponent
+        inc si
+        jmp ciclo
+    
+    follow:
+        cmp expr[0], 78h    ; Busca el coeficiente
+        je assignCoefficient
+        jmp searchCoefficient
+
+    assignCoefficient:
+        mov ax, 1d
+        mov coefficient, 31h
+        jmp defineExponent
+
+    searchCoefficient:
+        mov al, expr[di]
+        mov coefficient[di], al
+        inc di
+        cmp expr[di], 24h
+        je defineExponent
+        cmp expr[di], 78h       ; Se compara con x
+        je defineExponent
+        jmp searchCoefficient
+
+    defineExponent:
+        xor bx, bx
+        inc di
+        cmp expr[di], 24h
+        je setExponent
+        cmp expr[di], 5eh   ; Se compara la sig posicion a x con ^
+        je searchExponent   ; Si existe, se busca el numero
+        ; jmp setExponent     ; Si no existe, se setea un 1
+
+    setExponent:
+        mov bx, 1d
+        add bx, 1
+        mov number3n, bx
+        mov exponent, 31h
+        TextToDecimal exponent, number3n
+        jmp continue
+
+    searchExponent:
+        mov bl, expr[di+1]
+        mov exponent, bl
+        TextToDecimal exponent, number3n
+
+    continue:
+        xor cx, cx
+        xor ax, ax
+        ; PrintText coefficient
+        ; PrintText exponent
+        ; readUntilEnter bufferKey
+        TextToDecimal coefficient, number1n
+        mov ax, number1n
+        mov dx, number3n
+
+        xor si, si
+        mov si, dx
+        dec si
+        mov cl, al
+        ciclo2:
+            ; print test_info
+            cwd
+            imul cl
+            dec si
+            cmp si, 0d
+            jne ciclo2
+
+        mov number2n, ax ; Resultado de la multiplicacion
+        DecimalToText number2n, resultado2  ; Imprime coeficiente
+        readUntilEnter bufferKey
+        ; PrintText literal
+        ; PrintText raisedTo
+        ; DecimalToText number3n, resultado3  ; Imprime exponente
+        ; PrintText capturedSign
         jmp fin
 
     nonExponent:

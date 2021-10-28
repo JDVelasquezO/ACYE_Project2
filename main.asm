@@ -62,6 +62,12 @@ include files.asm
     dictKey db 0
     dictKeyString db 2 dup("$"), 0
 
+    arrayNumbers db "0123456789"
+    stackNumbers db 20 dup("$"), 0
+    val1 db 3 dup("$"), 0
+    val2 db 3 dup("$"), 0
+
+    counterTableNumbers dw 0
     counter dw 0
     counterTable dw 0
     counterChars dw 0
@@ -98,6 +104,8 @@ include files.asm
             je menuFunction
             cmp bufferRoute[0], 'p'
             je printFunctions
+            cmp bufferRoute[0], 'e'
+            je evExpr
             jmp menu
 
         menuFunction:
@@ -123,6 +131,12 @@ include files.asm
             clearTerminal
             printFuncs
             readUntilEnter bufferKey
+            jmp menu
+
+        evExpr:
+            clearTerminal
+            lookForFunction bufferRoute[1]
+            separateBySign funcIndividual
             jmp menu
         
         exitGame:
