@@ -861,32 +861,35 @@ substituteVar MACRO expr
     continue:
         xor cx, cx
         xor ax, ax
+        xor bx, bx
+        xor dx, dx
         ; PrintText coefficient
         ; PrintText exponent
         ; readUntilEnter bufferKey
-        TextToDecimal coefficient, number1n
-        mov ax, number1n
-        mov dx, number3n
 
+        TextToDecimal coefficient, number1n
+        mov bx, number1n
+        mov dx, number3n    ; Toma el valor del exponente
+        
+        mov ax, 2d          ; Toma el valor de x = 2
         xor si, si
         mov si, dx
         dec si
-        mov cl, al
+        ; mov cl, al
+        mov ch, al          ; Toma el valor por el que se va a multiplicar
         ciclo2:
-            ; print test_info
             cwd
-            imul cl
+            imul ch
             dec si
             cmp si, 0d
             jne ciclo2
 
+        ; mov bl, 3d
+        imul bl              ; Se multiplica por el coeficiente
+
         mov number2n, ax ; Resultado de la multiplicacion
         DecimalToText number2n, resultado2  ; Imprime coeficiente
         readUntilEnter bufferKey
-        ; PrintText literal
-        ; PrintText raisedTo
-        ; DecimalToText number3n, resultado3  ; Imprime exponente
-        ; PrintText capturedSign
         jmp fin
 
     nonExponent:
