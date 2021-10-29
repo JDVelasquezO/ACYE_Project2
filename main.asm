@@ -49,6 +49,8 @@ include files.asm
     resultExponent db 0
     exponent db 3 dup("$"), 0
     integratedExpr db 20 dup("$"), 0
+    resBefore dw 0
+    resAfter dw ?
     literal db "x $"
     raisedTo db "^ $"
     addSign db "+ $"
@@ -79,6 +81,7 @@ include files.asm
     resultado db ?
     resultado2 dw ?
     resultado3 dw ?
+    numberResBefore dw ?
     handle dw ?, 0
 .code
     ;description

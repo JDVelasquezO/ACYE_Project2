@@ -863,9 +863,6 @@ substituteVar MACRO expr
         xor ax, ax
         xor bx, bx
         xor dx, dx
-        ; PrintText coefficient
-        ; PrintText exponent
-        ; readUntilEnter bufferKey
 
         TextToDecimal coefficient, number1n
         mov bx, number1n
@@ -886,18 +883,29 @@ substituteVar MACRO expr
 
         imul bl              ; Se multiplica por el coeficiente
         
-        cmp ax, 240
+        cmp ax, 240d         ; Comparamos si es mayor a 240
         jge valueBigeer
 
         mov number2n, ax ; Resultado de la multiplicacion
+        mov resBefore, ax
         DecimalToText number2n, resultado2  ; Imprime coeficiente
         readUntilEnter bufferKey
         jmp fin
 
     nonExponent:
-        PrintText expr
-        PrintText literal
-        PrintText addSign
+        xor ax, ax
+        xor bx, bx
+        ; mov number1n, 0
+        ; DecimalToText resBefore, resultado2
+        ; print breakLine
+        ; PrintText expr
+        TextToDecimal expr, number1n
+        mov ax, resBefore
+        mov bx, number1n
+        add al, bl
+        mov resAfter, ax
+        DecimalToText resAfter, number2n
+
         jmp fin
 
     valueBigeer:
@@ -905,4 +913,5 @@ substituteVar MACRO expr
         readUntilEnter bufferKey
 
     fin:
+        readUntilEnter bufferKey
 ENDM
