@@ -138,6 +138,8 @@ include files.asm
             jmp menu
 
         evExpr:
+            mov resBefore, 0
+            mov resAfter, 0
             clearTerminal
             lookForFunction bufferRoute[1]
             separateBySign funcIndividual

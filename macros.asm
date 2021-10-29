@@ -801,9 +801,12 @@ separateBySign MACRO func
 ENDM
 
 substituteVar MACRO expr
-    local ciclo, multiplyWithoutExp, valueBigeer, ciclo2, printDivision, quitLessSign, follow, assignCoefficient, searchCoefficient, continue, defineExponent, setExponent, searchExponent, nonExponent, fin
+    local ciclo, addResBefore, continueFromAdd, multiplyWithoutExp, valueBigeer, ciclo2, printDivision, quitLessSign, follow, assignCoefficient, searchCoefficient, continue, defineExponent, setExponent, searchExponent, nonExponent, fin
 
     xor ax, ax
+    xor bx, bx
+    xor dx, dx
+    xor cx, cx
     xor di, di
     clearBuffer coefficient
 
@@ -840,15 +843,11 @@ substituteVar MACRO expr
         xor bx, bx
         inc di
         cmp expr[di], 24h
-        je setExponent
+        je setExponent      ; Si no existe nada, se setea un 1
         cmp expr[di], 5eh   ; Se compara la sig posicion a x con ^
         je searchExponent   ; Si existe, se busca el numero
-        ; jmp setExponent     ; Si no existe, se setea un 1
 
     setExponent:
-        ; mov bx, 1d
-        ; add bx, 1
-        ; mov number3n, bx
         mov exponent, 31h
         TextToDecimal exponent, number3n
         jmp continue
@@ -891,10 +890,22 @@ substituteVar MACRO expr
         jge valueBigeer
 
         mov number2n, ax ; Resultado de la multiplicacion
-        mov resBefore, ax
+
+        xor bx, bx
+        mov bx, resBefore
+        cmp bx, 0d
+        jne addResBefore    ; Sumar resultado anterior
+        mov resBefore, ax ; Guardar resultado
+
+        continueFromAdd:
         DecimalToText number2n, resultado2  ; Imprime coeficiente
         readUntilEnter bufferKey
         jmp fin
+
+    addResBefore:
+        add al, bl
+        mov resBefore, ax
+        jmp continueFromAdd
 
     nonExponent:
         xor ax, ax
@@ -905,6 +916,7 @@ substituteVar MACRO expr
         add al, bl
         mov resAfter, ax
         DecimalToText resAfter, number2n
+        readUntilEnter bufferKey
 
         jmp fin
 
@@ -913,5 +925,5 @@ substituteVar MACRO expr
         readUntilEnter bufferKey
 
     fin:
-        readUntilEnter bufferKey
+        ; readUntilEnter bufferKey
 ENDM
