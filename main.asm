@@ -142,7 +142,9 @@ include files.asm
             mov resAfter, 0
             clearTerminal
             lookForFunction bufferRoute[1]
-            separateBySign funcIndividual
+            separateBySign funcIndividual, 2d
+            DecimalToText resBefore, number2n
+            readUntilEnter bufferKey
             jmp menu
         
         exitGame:

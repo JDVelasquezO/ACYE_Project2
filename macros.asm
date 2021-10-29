@@ -762,7 +762,7 @@ evaluateExpr MACRO expr
     fin:
 ENDM
 
-separateBySign MACRO func
+separateBySign MACRO func, equisVal
     local ciclo0, ciclo1, exit, continue
     mov capturedSign, 2bh
     xor di, di
@@ -786,21 +786,23 @@ separateBySign MACRO func
             jmp ciclo1
 
         continue:
-            xor dx, dx
-            mov dl, func[di]
-            mov capturedSign, dl
-            substituteVar expression
+            substituteVar expression, equisVal
             xor di, di
-            add counterChars, 1
             mov di, counterChars
+            cmp func[di], 2dh
+            je ciclo0
+
+            add counterChars, 1
+            inc di
+            ; mov di, counterChars
             
             cmp func[di], 24h
             jne ciclo0
     exit:
-        substituteVar expression
+        substituteVar expression, equisVal
 ENDM
 
-substituteVar MACRO expr
+substituteVar MACRO expr, equisVal
     local ciclo, addResBefore, continueFromAdd, multiplyWithoutExp, valueBigeer, ciclo2, printDivision, quitLessSign, follow, assignCoefficient, searchCoefficient, continue, defineExponent, setExponent, searchExponent, nonExponent, fin
 
     xor ax, ax
@@ -866,7 +868,7 @@ substituteVar MACRO expr
         TextToDecimal coefficient, number1n
         mov bx, number1n    ; Toma el valor del coeficiente
         mov dx, number3n    ; Toma el valor del exponente
-        mov ax, 2d          ; Toma el valor de x = 2
+        mov ax, equisVal          ; Toma el valor de x
 
         cmp dl, 1d          ; Si no hay exponente
         je multiplyWithoutExp
@@ -898,12 +900,10 @@ substituteVar MACRO expr
         mov resBefore, ax ; Guardar resultado
 
         continueFromAdd:
-        DecimalToText number2n, resultado2  ; Imprime coeficiente
-        readUntilEnter bufferKey
         jmp fin
 
     addResBefore:
-        add al, bl
+        add ax, bx
         mov resBefore, ax
         jmp continueFromAdd
 
@@ -913,11 +913,9 @@ substituteVar MACRO expr
         TextToDecimal expr, number1n
         mov ax, resBefore
         mov bx, number1n
-        add al, bl
-        mov resAfter, ax
-        DecimalToText resAfter, number2n
-        readUntilEnter bufferKey
 
+        add ax, bx
+        mov resBefore, ax
         jmp fin
 
     valueBigeer:
@@ -925,5 +923,4 @@ substituteVar MACRO expr
         readUntilEnter bufferKey
 
     fin:
-        ; readUntilEnter bufferKey
 ENDM
