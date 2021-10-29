@@ -888,8 +888,8 @@ substituteVar MACRO expr, equisVal
         multiplyWithoutExp:
             imul bl              ; Se multiplica por el coeficiente
         
-        cmp ax, 240d         ; Comparamos si es mayor a 240
-        jge valueBigeer
+        cmp al, 240d         ; Comparamos si es mayor a 240
+        jge fin
 
         mov number2n, ax ; Resultado de la multiplicacion
 
@@ -917,10 +917,6 @@ substituteVar MACRO expr, equisVal
         add ax, bx
         mov resBefore, ax
         jmp fin
-
-    valueBigeer:
-        PrintText msgNotSpaceValue
-        readUntilEnter bufferKey
 
     fin:
 ENDM
