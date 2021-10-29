@@ -801,7 +801,7 @@ separateBySign MACRO func
 ENDM
 
 substituteVar MACRO expr
-    local ciclo, ciclo2, printDivision, quitLessSign, follow, assignCoefficient, searchCoefficient, continue, defineExponent, setExponent, searchExponent, nonExponent, fin
+    local ciclo, valueBigeer, ciclo2, printDivision, quitLessSign, follow, assignCoefficient, searchCoefficient, continue, defineExponent, setExponent, searchExponent, nonExponent, fin
 
     xor ax, ax
     xor di, di
@@ -884,8 +884,10 @@ substituteVar MACRO expr
             cmp si, 0d
             jne ciclo2
 
-        ; mov bl, 3d
         imul bl              ; Se multiplica por el coeficiente
+        
+        cmp ax, 240
+        jge valueBigeer
 
         mov number2n, ax ; Resultado de la multiplicacion
         DecimalToText number2n, resultado2  ; Imprime coeficiente
@@ -896,6 +898,11 @@ substituteVar MACRO expr
         PrintText expr
         PrintText literal
         PrintText addSign
+        jmp fin
+
+    valueBigeer:
+        PrintText msgNotSpaceValue
+        readUntilEnter bufferKey
 
     fin:
 ENDM

@@ -30,6 +30,7 @@ include files.asm
     msgFuncNotFound db "Funcion no encontrada $"
     test_info db "Aqui todo bien $"
     msgResIntegral db "La integral es: $"
+    msgNotSpaceValue db "El valor es muy grande"
     twoPonts db ": $"
     space db " ", "$"
     breakLine db " $", 13, 10
