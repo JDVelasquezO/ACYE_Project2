@@ -801,7 +801,7 @@ separateBySign MACRO func
 ENDM
 
 substituteVar MACRO expr
-    local ciclo, valueBigeer, ciclo2, printDivision, quitLessSign, follow, assignCoefficient, searchCoefficient, continue, defineExponent, setExponent, searchExponent, nonExponent, fin
+    local ciclo, multiplyWithoutExp, valueBigeer, ciclo2, printDivision, quitLessSign, follow, assignCoefficient, searchCoefficient, continue, defineExponent, setExponent, searchExponent, nonExponent, fin
 
     xor ax, ax
     xor di, di
@@ -846,9 +846,9 @@ substituteVar MACRO expr
         ; jmp setExponent     ; Si no existe, se setea un 1
 
     setExponent:
-        mov bx, 1d
-        add bx, 1
-        mov number3n, bx
+        ; mov bx, 1d
+        ; add bx, 1
+        ; mov number3n, bx
         mov exponent, 31h
         TextToDecimal exponent, number3n
         jmp continue
@@ -865,10 +865,13 @@ substituteVar MACRO expr
         xor dx, dx
 
         TextToDecimal coefficient, number1n
-        mov bx, number1n
+        mov bx, number1n    ; Toma el valor del coeficiente
         mov dx, number3n    ; Toma el valor del exponente
-        
         mov ax, 2d          ; Toma el valor de x = 2
+
+        cmp dl, 1d          ; Si no hay exponente
+        je multiplyWithoutExp
+
         xor si, si
         mov si, dx
         dec si
@@ -881,7 +884,8 @@ substituteVar MACRO expr
             cmp si, 0d
             jne ciclo2
 
-        imul bl              ; Se multiplica por el coeficiente
+        multiplyWithoutExp:
+            imul bl              ; Se multiplica por el coeficiente
         
         cmp ax, 240d         ; Comparamos si es mayor a 240
         jge valueBigeer
@@ -895,10 +899,6 @@ substituteVar MACRO expr
     nonExponent:
         xor ax, ax
         xor bx, bx
-        ; mov number1n, 0
-        ; DecimalToText resBefore, resultado2
-        ; print breakLine
-        ; PrintText expr
         TextToDecimal expr, number1n
         mov ax, resBefore
         mov bx, number1n
