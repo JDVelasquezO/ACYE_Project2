@@ -31,6 +31,7 @@ include files.asm
     msgFuncNotFound db "Funcion no encontrada $"
     test_info db "Aqui todo bien $"
     msgResIntegral db "La integral es: $"
+    msgResDerivate db "La derivada es: $"
     textoFuncion db "Ingrese la funcion lineal que desea resolver: $"
     twoPonts db ": $"
     space db " ", "$"
@@ -55,6 +56,7 @@ include files.asm
     raisedTo db "^ $"
     addSign db "+ $"
     lessSign db "- $"
+    zero db "0 $"
     constant db "C $"
     over db "/ $"
     resIntegral db 20 dup("$"), 0
@@ -85,10 +87,29 @@ include files.asm
     number1n dw ?
     number2n dw ?
     number3n dw ?
+    number4n dw ?
     resultado db ?
     resultado2 dw ?
     resultado3 dw ?
     handle dw ?, 0
+
+    izquierda db 10 dup('$'),'$'
+    letraa db 5 dup('$'),'$'
+    contenedor db 20 dup("$"), 0
+    varmul dw ?
+    expresion dw ?
+    derivada dw 30 dup('$'),'$'
+
+    texta db 5 dup('$')
+    textb db 5 dup('$')
+    textc db 5 dup('$')
+    vara db ?
+    varb db ?
+    varc db ?
+    slinea db 0ah,"$"
+    ;Colores
+    blanco db 15d
+    transparente db 0d
 .code
     ;description
     main PROC
@@ -124,6 +145,9 @@ include files.asm
         derivateFunc:
             clearTerminal
             lookForFunction bufferRoute[1]
+            PrintText msgResDerivate
+            derivate funcIndividual
+            readUntilEnter bufferKey
             jmp menu
 
         integrateFunc:

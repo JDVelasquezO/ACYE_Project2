@@ -646,7 +646,7 @@ printFuncs MACRO params
 ENDM
 
 integration MACRO func
-    local ciclo0, ciclo1, exit
+    local ciclo0, ciclo1, exit, continue
     mov capturedSign, 2bh
     xor di, di
     mov counterChars, 0
@@ -778,6 +778,127 @@ evaluateExpr MACRO expr
         PrintText expr
         PrintText literal
         PrintText addSign
+
+    fin:
+ENDM
+
+derivate MACRO func
+    local ciclo0, ciclo1, exit, continue
+    mov capturedSign, 2bh
+    xor di, di
+    mov counterChars, 0
+    ciclo0:
+        xor si, si
+        xor ax, ax
+        clearBuffer expression
+        ciclo1:
+            mov ah, func[di]
+            mov expression[si], ah
+            inc di
+            inc si
+            add counterChars, 1
+            cmp func[di], 24h
+            je exit
+            cmp func[di], 2bh ; Compara si es +
+            je continue
+            cmp func[di], 2dh ; Compara si es -
+            je continue
+            jmp ciclo1
+
+        continue:
+            xor dx, dx
+            mov dl, func[di]
+            mov capturedSign, dl
+            evaluateExpr2 expression
+            xor di, di
+            add counterChars, 1
+            mov di, counterChars
+            
+            cmp func[di], 24h
+            jne ciclo0
+    exit:
+        evaluateExpr2 expression
+ENDM
+
+evaluateExpr2 MACRO expr
+    local ciclo, printDivision, quitLessSign, follow, assignCoefficient, searchCoefficient, continue, defineExponent, setExponent, searchExponent, nonExponent, fin
+
+    xor ax, ax
+    xor di, di
+    clearBuffer coefficient
+
+    xor si, si
+    ciclo:  ; Ciclo para saber si viene al menos una x
+        cmp expr[si], 78h
+        je follow
+        cmp expr[si], 24h
+        je fin
+        inc si
+        jmp ciclo
+    
+    follow:
+        cmp expr[0], 78h    ; Se compara con x
+        je assignCoefficient
+        jmp searchCoefficient
+
+    assignCoefficient:
+        mov ax, 1d
+        mov coefficient, 31h
+        jmp defineExponent
+
+    searchCoefficient:
+        mov al, expr[di]
+        mov coefficient[di], al
+        inc di
+        cmp expr[di], 24h
+        je defineExponent
+        cmp expr[di], 78h       ; Se compara con x
+        je defineExponent
+        jmp searchCoefficient
+
+    defineExponent:
+        xor bx, bx
+        inc di
+        cmp expr[di], 24h
+        je setExponent
+        cmp expr[di], 5eh   ; Se compara la sig posicion a x con ^
+        je searchExponent   ; Si existe, se busca el numero
+
+    setExponent:
+        PrintText coefficient
+        jmp fin
+
+    searchExponent:
+        mov bl, expr[di+1]
+        mov exponent, bl
+        TextToDecimal exponent, number3n
+
+    continue:
+        ; mov number2n, 0
+        xor cx, cx
+        xor ax, ax
+        xor bx, bx
+        
+        TextToDecimal coefficient, number1n
+        mov ax, number1n
+        mov cx, number3n
+        cwd
+        imul cx
+
+        mov number2n, ax
+        DecimalToText number2n, resultado2  ; Imprime coeficiente
+        PrintText literal
+        PrintText raisedTo
+
+        mov bx, number3n
+        sub bx, 1
+        mov number4n, bx
+        DecimalToText number4n, resultado3  ; Imprime exponente
+        PrintText capturedSign
+        jmp fin
+
+    nonExponent:
+        PrintText zero
 
     fin:
 ENDM
@@ -917,4 +1038,4 @@ ResolverFuncion macro
     pop bx
     pop ax
 
-endm 
+endm
