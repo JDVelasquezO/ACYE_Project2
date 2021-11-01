@@ -17,7 +17,8 @@ include files.asm
     headersMenuFunc db 0ah, 0dh, '--- Menu de Funciones ---',
                        0ah, 0dh, 'a. Ingresar Funcion',
                        0ah, 0dh, 'b. Cargar Archivos',
-                       0ah, 0dh, 'c. Regresar a menu principal',
+                       0ah, 0dh, 'c. Resolver Ecuaciones Lineales',
+                       0ah, 0dh, 'd. Regresar a menu principal',
                        0ah, 0dh, '$'
 
     msgInsertFunc db "Ingrese funcion a evaluar $"
@@ -30,11 +31,12 @@ include files.asm
     msgFuncNotFound db "Funcion no encontrada $"
     test_info db "Aqui todo bien $"
     msgResIntegral db "La integral es: $"
-    msgNotSpaceValue db "El valor es muy grande"
+    textoFuncion db "Ingrese la funcion lineal que desea resolver: $"
     twoPonts db ": $"
     space db " ", "$"
     breakLine db " $", 13, 10
 
+    bufferTeclado db 50 dup("$"),"$"
     bufferFile db 1000 dup("$"), "$"
     bufferRoute db 20 dup("$"), 0
     bufferMenuFunc db 20 dup("$"), 0
@@ -49,8 +51,6 @@ include files.asm
     resultExponent db 0
     exponent db 3 dup("$"), 0
     integratedExpr db 20 dup("$"), 0
-    resBefore dw 0
-    resAfter dw ?
     literal db "x $"
     raisedTo db "^ $"
     addSign db "+ $"
@@ -64,13 +64,20 @@ include files.asm
     dictTable db 200 dup("$"), 0
     dictKey db 0
     dictKeyString db 2 dup("$"), 0
+    
+    signoMenos db "-$"
+    signoDiv db "/$"
+    valorDeM db 0d
+    valorDeB db 0d
+    MDec db 0d
+    MUn  db 1d
+    BDec db 0d
+    BUn db 1d
+    respuesta db 0d
+    ;banderas
+    mEsNegativa db 0d
+    bEsNegativo db 0d
 
-    arrayNumbers db "0123456789"
-    stackNumbers db 20 dup("$"), 0
-    val1 db 3 dup("$"), 0
-    val2 db 3 dup("$"), 0
-
-    counterTableNumbers dw 0
     counter dw 0
     counterTable dw 0
     counterChars dw 0
@@ -81,7 +88,6 @@ include files.asm
     resultado db ?
     resultado2 dw ?
     resultado3 dw ?
-    numberResBefore dw ?
     handle dw ?, 0
 .code
     ;description
@@ -108,8 +114,6 @@ include files.asm
             je menuFunction
             cmp bufferRoute[0], 'p'
             je printFunctions
-            cmp bufferRoute[0], 'e'
-            je evExpr
             jmp menu
 
         menuFunction:
@@ -134,16 +138,6 @@ include files.asm
         printFunctions:
             clearTerminal
             printFuncs
-            readUntilEnter bufferKey
-            jmp menu
-
-        evExpr:
-            mov resBefore, 0
-            mov resAfter, 0
-            clearTerminal
-            lookForFunction bufferRoute[1]
-            separateBySign funcIndividual, 99d
-            DecimalToText resBefore, number2n
             readUntilEnter bufferKey
             jmp menu
         

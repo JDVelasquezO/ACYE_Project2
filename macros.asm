@@ -204,14 +204,14 @@ Imprimir8bits macro registro
     xor ax,ax
     mov al,registro
     mov cx,10
-    mov bx,3
+    mov bx,2
     cualquiera:
     xor dx,dx
     div cx
     push dx
     dec bx
     jnz cualquiera
-    mov bx,3
+    mov bx,2
     noz:
     pop dx
     ImprimirNumero dl
@@ -352,8 +352,16 @@ TextToDecimal macro buffer, des ;Converts text to decimal
         xor si, si
 endm
 
+ImprimirTexto macro Texto ; Ingresar Texto para imprimir
+    ;mov ax,@data
+    ;mov ds,ax
+    mov ah,09h
+    lea dx,Texto
+    int 21h
+endm
+
 loadMenuFunction MACRO
-    local menuFunc, fin, insertFunc, chargeFileFunc
+    local menuFunc, fin, insertFunc, chargeFileFunc, solveLinearFunc
 
     menuFunc:
         clearTerminal
@@ -364,6 +372,8 @@ loadMenuFunction MACRO
         cmp bufferMenuFunc[0], "b"
         je chargeFileFunc
         cmp bufferMenuFunc[0], "c"
+        je solveLinearFunc
+        cmp bufferMenuFunc[0], "d"
         je fin
         jmp menuFunc
 
@@ -380,6 +390,16 @@ loadMenuFunction MACRO
         print msgChargeFileFunc
         readUntilEnter bufferFunction
         loadFile bufferFunction
+        jmp menuFunc
+
+    solveLinearFunc:
+        clearTerminal
+        print textoFuncion
+        clearBuffer bufferTeclado
+        readUntilEnter bufferTeclado
+        print breakLine
+        ResolverFuncion
+        readUntilEnter bufferKey
         jmp menuFunc
     
     fin:
@@ -626,7 +646,7 @@ printFuncs MACRO params
 ENDM
 
 integration MACRO func
-    local ciclo0, ciclo1, exit, continue
+    local ciclo0, ciclo1, exit
     mov capturedSign, 2bh
     xor di, di
     mov counterChars, 0
@@ -762,161 +782,139 @@ evaluateExpr MACRO expr
     fin:
 ENDM
 
-separateBySign MACRO func, equisVal
-    local ciclo0, ciclo1, exit, continue
-    mov capturedSign, 2bh
-    xor di, di
-    mov counterChars, 0
-    ciclo0:
-        xor si, si
-        xor ax, ax
-        clearBuffer expression
-        ciclo1:
-            mov ah, func[di]
-            mov expression[si], ah
-            inc di
-            inc si
-            add counterChars, 1
-            cmp func[di], 24h
-            je exit
-            cmp func[di], 2bh ; Compara si es +
-            je continue
-            cmp func[di], 2dh ; Compara si es -
-            je continue
-            jmp ciclo1
-
-        continue:
-            substituteVar expression, equisVal
-            xor di, di
-            mov di, counterChars
-            cmp func[di], 2dh
-            je ciclo0
-
-            add counterChars, 1
-            inc di
-            ; mov di, counterChars
-            
-            cmp func[di], 24h
-            jne ciclo0
-    exit:
-        substituteVar expression, equisVal
-ENDM
-
-substituteVar MACRO expr, equisVal
-    local ciclo, addResBefore, continueFromAdd, multiplyWithoutExp, valueBigeer, ciclo2, printDivision, quitLessSign, follow, assignCoefficient, searchCoefficient, continue, defineExponent, setExponent, searchExponent, nonExponent, fin
-
-    xor ax, ax
-    xor bx, bx
-    xor dx, dx
-    xor cx, cx
-    xor di, di
-    clearBuffer coefficient
-
-    xor si, si
-    ciclo:  ; Ciclo para saber si viene al menos una x
-        cmp expr[si], 78h
-        je follow
-        cmp expr[si], 24h
-        je nonExponent
-        inc si
-        jmp ciclo
+ResolverFuncion macro
     
-    follow:
-        cmp expr[0], 78h    ; Busca el coeficiente
-        je assignCoefficient
-        jmp searchCoefficient
 
-    assignCoefficient:
-        mov ax, 1d
-        mov coefficient, 31h
-        jmp defineExponent
+    Local Coeficiente
+    Local EsUnoM
+    Local DeterminarSignoB
+    Local DeterminarB
+    Local Operaciones
+    Local RespPos
+    Local ResEntero
+    Local fin
 
-    searchCoefficient:
-        mov al, expr[di]
-        mov coefficient[di], al
-        inc di
-        cmp expr[di], 24h
-        je defineExponent
-        cmp expr[di], 78h       ; Se compara con x
-        je defineExponent
-        jmp searchCoefficient
+    push ax
+    push bx
 
-    defineExponent:
-        xor bx, bx
-        inc di
-        cmp expr[di], 24h
-        je setExponent      ; Si no existe nada, se setea un 1
-        cmp expr[di], 5eh   ; Se compara la sig posicion a x con ^
-        je searchExponent   ; Si existe, se busca el numero
+    mov si, 0d
+    mov mEsNegativa, 0d
+    mov bEsNegativo, 0d
+    mov MDec,0d
+    mov MUn,1d
+    mov BDec,0d
+    mov BUn,1d
 
-    setExponent:
-        mov exponent, 31h
-        TextToDecimal exponent, number3n
-        jmp continue
+    cmp bufferTeclado[si], 45d
+    jnz Coeficiente
 
-    searchExponent:
-        mov bl, expr[di+1]
-        mov exponent, bl
-        TextToDecimal exponent, number3n
+    mov mEsNegativa, 1d
+    inc si
 
-    continue:
-        xor cx, cx
-        xor ax, ax
-        xor bx, bx
-        xor dx, dx
-
-        TextToDecimal coefficient, number1n
-        mov bx, number1n    ; Toma el valor del coeficiente
-        mov dx, number3n    ; Toma el valor del exponente
-        mov ax, equisVal          ; Toma el valor de x
-
-        cmp dl, 1d          ; Si no hay exponente
-        je multiplyWithoutExp
-
-        xor si, si
-        mov si, dx
-        dec si
-        ; mov cl, al
-        mov ch, al          ; Toma el valor por el que se va a multiplicar
-        ciclo2:
-            cwd
-            imul ch
-            dec si
-            cmp si, 0d
-            jne ciclo2
-
-        multiplyWithoutExp:
-            imul bl              ; Se multiplica por el coeficiente
+    Coeficiente:
+        cmp bufferTeclado[si], 120d
+        jz DeterminarSignoB
         
-        cmp al, 240d         ; Comparamos si es mayor a 240
-        jge fin
+        mov al, bufferTeclado[si]
+        sub al, 48d
+        mov MUn, al
 
-        mov number2n, ax ; Resultado de la multiplicacion
+        inc si
+        cmp bufferTeclado[si], 120d
+        jz DeterminarSignoB
 
-        xor bx, bx
-        mov bx, resBefore
-        cmp bx, 0d
-        jne addResBefore    ; Sumar resultado anterior
-        mov resBefore, ax ; Guardar resultado
 
-        continueFromAdd:
-        jmp fin
+        mov MDec, al
+        mov al, bufferTeclado[si]
+        sub al, 48d
+        mov MUn, al
+        inc si
+        jmp DeterminarSignoB
 
-    addResBefore:
-        add ax, bx
-        mov resBefore, ax
-        jmp continueFromAdd
 
-    nonExponent:
+    DeterminarSignoB:
+        inc si
+        cmp bufferTeclado[si], 43d
+        jnz DeterminarB
+        mov bEsNegativo, 1d
+
+    DeterminarB:
         xor ax, ax
-        xor bx, bx
-        TextToDecimal expr, number1n
-        mov ax, resBefore
-        mov bx, number1n
+        inc si
+        mov al, bufferTeclado[si]
+        sub al, 48d
+        mov BUn, al
+        
+        inc si
+        cmp bufferTeclado[si], 36d
+        jz Operaciones
 
-        add ax, bx
-        mov resBefore, ax
-        jmp fin
+        mov BDec, al
+        mov al, bufferTeclado[si]
+        sub al, 48d
+        mov BUn, al   
+        inc si
+
+    Operaciones:
+
+        xor ax, ax
+        mov al, MDec
+        mov bl, 10d
+        mul bl
+
+        mov MDec, al
+
+        mov al, MDec
+        mov ah, MUn
+
+        add ah, al
+        mov valorDeM, ah
+
+
+        xor ax, ax
+        mov al, BDec
+        mov bl, 10d
+        mul bl
+
+        mov BDec, al        
+
+        mov al, BDec
+        mov ah, BUn
+
+        add ah, al
+        mov valorDeB, ah
+
+
+        mov al, mEsNegativa
+        mov ah, bEsNegativo
+        cmp ah, al
+        jz RespPos
+        ImprimirTexto signoMenos
+        xor ax, ax
+
+    RespPos:
+    
+
+    mov al, valorDeB
+    mov bl, valorDeM
+
+    div bl
+
+    cmp ah, 0d
+    jz ResEntero
+
+    Imprimir8bits valorDeB
+    ImprimirTexto signoDiv
+    Imprimir8bits valorDeM
+    jmp fin
+
+    ResEntero:
+        mov respuesta, al
+        Imprimir8bits respuesta
 
     fin:
-ENDM
+
+    pop bx
+    pop ax
+
+endm 
