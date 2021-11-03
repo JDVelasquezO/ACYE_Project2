@@ -5,12 +5,12 @@ include files.asm
 .stack 100h
 .data
     headers db 	0ah,0dh,'Universidad de San Carlos de Guatemala',
-                0ah,0dh,'Arquitectura de Computadores y Ensambladores 1',
-                0ah, 0dh,'-- Menu Principal --',
+                0ah,0dh,'-- Menu Principal --',
                 0ah,0dh,'-- (dID) Derivar funcion --',
                 0ah,0dh,'-- (iID) Integrar funcion --',
                 0ah,0dh,'-- (func) Ingresar funciones --',
                 0ah,0dh,'-- (print) Imprimir funciones --',
+                0ah,0dh,'-- (graph) Mostrar Coordenadas --',
                 0ah,0dh,'-- (x) Salir',
                 0ah,0dh,'$'
 
@@ -18,7 +18,8 @@ include files.asm
                        0ah, 0dh, 'a. Ingresar Funcion',
                        0ah, 0dh, 'b. Cargar Archivos',
                        0ah, 0dh, 'c. Resolver Ecuaciones Lineales',
-                       0ah, 0dh, 'd. Regresar a menu principal',
+                       0ah, 0dh, 'd. Resolver Ecuaciones Cuadraticas',
+                       0ah, 0dh, 'e. Regresar a menu principal',
                        0ah, 0dh, '$'
 
     msgInsertFunc db "Ingrese funcion a evaluar $"
@@ -62,6 +63,10 @@ include files.asm
     resIntegral db 20 dup("$"), 0
     counterResIntegral db 0
     capturedSign db 2 dup("$"), 0
+    valorX dw 0d
+    valorXReal dw 0d
+    valorY dw 0d
+    valorYReal dw 0d
 
     dictTable db 200 dup("$"), 0
     dictKey db 0
@@ -93,6 +98,21 @@ include files.asm
     resultado3 dw ?
     handle dw ?, 0
 
+    ;variables
+    vartmp dw ?
+    vartmp2 dw ?
+    numerador1 dw ?
+    numerador2 dw ?
+    denominador1 dw ?
+    denominador2 dw ?
+    resDenominador1 dw ?
+    resDenominador2 dw ?
+    resDenominador3 dw ?
+    vara dw ?
+    varb dw ?
+    varc dw ?
+    counterCuadratic dw 0
+
     izquierda db 10 dup('$'),'$'
     letraa db 5 dup('$'),'$'
     contenedor db 20 dup("$"), 0
@@ -103,9 +123,6 @@ include files.asm
     texta db 5 dup('$')
     textb db 5 dup('$')
     textc db 5 dup('$')
-    vara db ?
-    varb db ?
-    varc db ?
     slinea db 0ah,"$"
     ;Colores
     blanco db 15d
@@ -135,6 +152,8 @@ include files.asm
             je menuFunction
             cmp bufferRoute[0], 'p'
             je printFunctions
+            cmp bufferRoute[0], 'g'
+            je graphPlane
             jmp menu
 
         menuFunction:
@@ -162,6 +181,13 @@ include files.asm
         printFunctions:
             clearTerminal
             printFuncs
+            readUntilEnter bufferKey
+            jmp menu
+
+        graphPlane:
+            clearTerminal
+            DibujarPlanos
+            FuncionGraf
             readUntilEnter bufferKey
             jmp menu
         

@@ -374,6 +374,8 @@ loadMenuFunction MACRO
         cmp bufferMenuFunc[0], "c"
         je solveLinearFunc
         cmp bufferMenuFunc[0], "d"
+        je solveCuadraticFunc
+        cmp bufferMenuFunc[0], "e"
         je fin
         jmp menuFunc
 
@@ -400,6 +402,15 @@ loadMenuFunction MACRO
         print breakLine
         ResolverFuncion
         readUntilEnter bufferKey
+        jmp menuFunc
+
+    solveCuadraticFunc:
+        clearTerminal
+        clearBuffer bufferFunction
+        print msgInsertFunc
+        readUntilEnter bufferFunction
+        solveCuadratic bufferFunction
+        Formula
         jmp menuFunc
     
     fin:
@@ -1038,4 +1049,288 @@ ResolverFuncion macro
     pop bx
     pop ax
 
+endm
+
+DibujarPlanos macro
+
+    Local ciclo1
+    Local ciclo2
+
+    mov ah,0d
+    mov al, 12h
+    int 10h
+
+    xor ax,ax
+    mov valorX, 320
+    mov valorY,0
+
+    mov ah, 0ch
+    mov al, 0Ah
+    mov bh, 0d
+
+    ciclo1:        
+        mov cx, valorX
+        mov dx, valorY
+        int 10h
+        
+        inc valorY
+        cmp valorY, 480
+        jnz ciclo1
+
+
+    mov valorx, 0d
+    mov valorY, 240
+    
+    ciclo2:
+        mov cx, valorX
+        mov dx, valorY
+        int 10h
+
+        inc valorX
+        cmp valorX, 640
+        jnz ciclo2
+
+endm
+
+FuncionGraf macro
+
+    Local ciclo
+
+    xor ax, ax
+    xor bx, bx
+
+    mov ah, 0ch
+    mov al, 0Ch
+    mov bh, 0d
+
+    mov valorX,221d
+    mov valorXReal, -99d
+    ;mov valorY, 640d
+    ciclo:
+        mov cx, valorX
+        mov dx, valorY
+        int 10h
+        
+        inc valorX
+        inc valorXReal
+        cmp valorX, 419
+        jnz ciclo
+
+endm
+
+solveCuadratic MACRO func
+    local ciclo0, ciclo1, exit, continue
+    mov capturedSign, 2bh
+    xor di, di
+    mov counterChars, 0
+    ciclo0:
+        xor si, si
+        xor ax, ax
+        clearBuffer expression
+        ciclo1:
+            mov ah, func[di]
+            mov expression[si], ah
+            inc di
+            inc si
+            add counterChars, 1
+            cmp func[di], 24h
+            je exit
+            cmp func[di], 2bh ; Compara si es +
+            je continue
+            cmp func[di], 2dh ; Compara si es -
+            je continue
+            jmp ciclo1
+
+        continue:
+            xor dx, dx
+            mov dl, func[di]
+            mov capturedSign, dl
+            evaluateExpr3 expression
+            xor di, di
+            add counterChars, 1
+            mov di, counterChars
+            
+            cmp func[di], 24h
+            jne ciclo0
+    exit:
+        evaluateExpr3 expression
+ENDM
+
+evaluateExpr3 MACRO expr
+    local searchCoefficient, continue, fin, firstCoef, secondCoef, thirdCoef
+
+    xor ax, ax
+    xor di, di
+    clearBuffer coefficient
+
+    searchCoefficient:
+        mov al, expr[di]
+        mov coefficient[di], al
+        inc di
+        cmp expr[di], 24h
+        je continue
+        cmp expr[di], 78h       ; Se compara con x
+        je continue
+        jmp searchCoefficient
+
+    continue:
+        ; mov number2n, 0
+        xor cx, cx
+        xor ax, ax
+        xor bx, bx
+        
+        cmp counterCuadratic, 0
+        je firstCoef
+        cmp counterCuadratic, 1
+        je secondCoef
+        jmp thirdCoef
+
+        firstCoef:
+            ; PrintText coefficient
+            TextToDecimal coefficient, vara
+            jmp fin
+
+        secondCoef:
+            ; PrintText coefficient
+            TextToDecimal coefficient, varb
+            jmp fin
+
+        thirdCoef:
+            ; PrintText coefficient
+            TextToDecimal coefficient, varc
+
+    fin:
+        add counterCuadratic, 1
+ENDM
+
+Formula macro
+    local espositivo1,espositivo2,esnegativo1,esnegativo2,seguir1,seguir2
+    OperarRaiz
+    OperarNumeradorPositivo
+    OperarNumeroadorNegativo
+    OperarDenominador
+endm
+
+OperarRaiz macro
+    local menor,mayor,igual
+    push ax
+    push bx
+    push cx
+    ;4*a*c
+    xor ax,ax
+    xor bx,bx
+    mov ax,vara
+    mov bx,varc
+    imul bx
+    mov bx,4
+    imul bx
+    mov vartmp,ax
+
+    ;B^2
+    xor ax,ax
+    xor bx,bx
+    mov ax,varb
+    mov bx,varb
+    imul bx
+    mov vartmp2,ax
+    
+    ;B^2-4ac
+    xor ax,ax
+    xor bx,bx
+    mov ax,vartmp2
+    mov bx,vartmp
+    sub ax,bx
+    mov vartmp,ax
+
+    ;raiz(B^2-4ac)
+    xor ax,ax
+    xor bx,bx
+    mov bx, vartmp
+    xor cx, cx
+
+    mul cx
+    mov ax, cx
+    cmp ax, bx
+    ja mayor
+    jb menor
+    jc igual 
+
+    menor:
+        inc cx
+        mov ax, cx
+        mul cx
+        cmp ax, bx
+        ja mayor
+        je igual
+        jb menor
+
+    mayor:
+        dec cx
+        jmp igual
+    igual:
+    mov vartmp,cx
+
+    pop cx
+    pop bx
+    pop ax
+endm
+OperarNumeradorPositivo macro
+    push ax
+    push bx
+    ;-b
+    xor ax,ax
+    xor bx,bx
+    mov ax,varb
+    neg ax
+
+    ;-b+raiz(B^2-4ac)
+    xor bx,bx
+    mov bx,vartmp
+    add ax,bx
+
+    
+    mov numerador1,ax
+
+    Imprimir16bits numerador1
+    readUntilEnter bufferKey
+    pop bx
+    pop ax
+endm
+OperarNumeroadorNegativo macro
+    push ax
+    push bx
+    ;-b
+    xor ax,ax
+    xor bx,bx
+    mov ax,varb
+    neg ax
+
+    ;-b+raiz(B^2-4ac)
+    xor bx,bx
+    mov bx,vartmp
+    sub ax,bx
+    
+    mov numerador2,ax
+
+    Imprimir16bits numerador2
+    readUntilEnter bufferKey
+    pop bx
+    pop ax
+endm
+OperarDenominador macro
+    push ax
+    push bx
+    xor ax,ax
+    xor bx,bx
+    mov ax,vara
+    mov bx,2
+    imul bx
+
+    mov denominador1,ax
+    mov denominador2,ax
+
+    Imprimir16bits denominador1
+    readUntilEnter bufferKey
+    pop bx
+    pop ax
 endm
